@@ -19,6 +19,7 @@ Payload Dumper App for Android
 + Add progress bar
 + Add hashing to check extracted images integrity
 + Add more architectures
++ Add support to extract from zip file (currently payload.bin only is supported)
 
 ## Thanks to <a href="https://github.com/ssut/payload-dumper-go">ssut/payload-dumper-go</a>
 
