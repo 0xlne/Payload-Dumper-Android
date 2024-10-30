@@ -11,7 +11,7 @@ android {
     defaultConfig {
         applicationId = "com.rajmani7584.payloaddumper"
         minSdk = 24
-        targetSdk = 28
+        targetSdk = 34
         versionCode = 1
         versionName = "1.0"
 
