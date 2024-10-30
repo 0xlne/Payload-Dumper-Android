@@ -5,6 +5,7 @@ Payload Dumper App for Android
 ## Currently app is working
 
 ### But i've not tested it completely
+### #library compiled only for arm64 for now
 
 >### May not extract some partition correctly
 
@@ -17,6 +18,7 @@ Payload Dumper App for Android
 + Save extracting thread after scrolling out of view
 + Add progress bar
 + Add hashing to check extracted images integrity
++ Add more architectures
 
 ## Thanks to <a href="https://github.com/ssut/payload-dumper-go">ssut/payload-dumper-go</a>
 
