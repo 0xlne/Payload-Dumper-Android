@@ -15,7 +15,6 @@ Payload Dumper App for Android
 
 
 ## # TODO
-+ Save extracting thread after scrolling out of view
 + Add progress bar
 + Add hashing to check extracted images integrity
 + Add more architectures

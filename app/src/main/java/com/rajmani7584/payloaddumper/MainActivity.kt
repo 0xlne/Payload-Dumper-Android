@@ -8,6 +8,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -19,7 +20,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -160,24 +163,24 @@ class MainActivity : ComponentActivity() {
                 Text(listOutput)
             }
             else {
-                LazyColumn(
+                Column(
                     Modifier
                         .fillMaxWidth()
                         .padding(8.dp)
                         .background(Color(0x34898989), shape = RoundedCornerShape(12.dp))
+                        .verticalScroll(rememberScrollState(0))
                 ) {
-                    items(partitionsList.size) { index ->
-                        val (partitionName, partitionSize) = partitionsList[index]
-                        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(top = 4.dp, start = 14.dp, end = 14.dp).background(Color(
+                    for ((partitionName, partitionSize) in partitionsList) {
+//                        val (partitionName, partitionSize) = partitionsList[index]
+                        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(top = 4.dp, start = 6.dp, end = 6.dp).background(Color(
                             0x56C0DDF3
                         ), shape = RoundedCornerShape(12.dp))) {
-                            var status by remember { mutableStateOf("status") }
-                            Text(partitionName, fontSize = 22.sp)
-                            Spacer(Modifier.width(8.dp))
-                            Text(status)
-                            Spacer(Modifier.weight(1f))
-                            Text("$partitionSize KB", fontSize = 22.sp)
-                            Spacer(Modifier.width(8.dp))
+                            var status by remember { mutableStateOf("idle") }
+                            Text(partitionName, fontSize = 16.sp)
+                            Column (Modifier.weight(1f).horizontalScroll(rememberScrollState(0)), horizontalAlignment = Alignment.End) {
+                                Text("Size: $partitionSize KB", fontSize = 16.sp)
+                                Text("Status: $status", fontSize = 16.sp)
+                            }
                             Button(onClick = {
                                 thread {
                                     status = "Extracting..."
