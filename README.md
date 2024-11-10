@@ -7,7 +7,7 @@ Payload Dumper App for Android
 ### But i've not tested it completely
 ### #library compiled only for arm64 for now
 
->### May not extract some partition correctly
+>### <s>May not extract some partition correctly</s>
 
 > Use extracted partition only for ref/study
 

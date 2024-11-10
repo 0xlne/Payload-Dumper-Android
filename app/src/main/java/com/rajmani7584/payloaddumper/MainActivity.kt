@@ -170,6 +170,7 @@ class MainActivity : ComponentActivity() {
                         .background(Color(0x34898989), shape = RoundedCornerShape(12.dp))
                         .verticalScroll(rememberScrollState(0))
                 ) {
+                    Text("Images already exists will be override!", color = Color.Red, modifier = Modifier.padding(start = 8.dp))
                     for ((partitionName, partitionSize) in partitionsList) {
 //                        val (partitionName, partitionSize) = partitionsList[index]
                         Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(top = 4.dp, start = 6.dp, end = 6.dp).background(Color(
@@ -224,14 +225,13 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    @Deprecated("Deprecated in Java")
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String?>,
-        grantResults: IntArray
+        grantResults: IntArray,
+        deviceId: Int
     ) {
-        @Suppress("DEPRECATION")
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults, deviceId)
         requestCounter++
     }
 

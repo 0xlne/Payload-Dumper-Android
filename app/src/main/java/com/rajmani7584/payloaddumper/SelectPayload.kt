@@ -161,7 +161,7 @@ fun FileButton(
             contentDescription = null,
             modifier = Modifier.padding(horizontal = 8.dp)
         )
-        Text(file.removePrefix("fl:"), fontSize = 18.sp)
+        Text(file.removePrefix("fl:"), fontSize = 14.sp)
     }
 }
 
@@ -182,6 +182,6 @@ fun FolderButton(
             contentDescription = null,
             modifier = Modifier.padding(horizontal = 8.dp)
         )
-        Text(file, fontSize = 18.sp)
+        Text(file, fontSize = 14.sp)
     }
 }
