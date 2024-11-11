@@ -36,13 +36,11 @@ import java.io.File
 
 @Composable
 fun SelectPayload(
-    typeDir: MutableState<Boolean>,
     currentPath: MutableState<String>,
-    dirPath: String,
-    outputDirectory: MutableState<String>,
-    payload: MutableState<String>,
-    selectingPayload: MutableState<Boolean>,
-    modifier: Modifier
+    typeDir: MutableState<Boolean>,
+    modifier: Modifier,
+    onSelect: (String) -> Unit,
+    onDismiss: () -> Unit
 ) {
     val fileModifier = Modifier
         .padding(7.dp)
@@ -55,7 +53,7 @@ fun SelectPayload(
     var canGoBack by remember { mutableStateOf(true) }
 
     LaunchedEffect(currentPath.value) {
-        canGoBack = currentPath.value.length > dirPath.length
+        canGoBack = File(currentPath.value).parentFile?.canWrite() == true
         fileList.clear()
 
         withContext(Dispatchers.IO) {
@@ -76,7 +74,7 @@ fun SelectPayload(
         }
     }
 
-    Dialog(onDismissRequest = { selectingPayload.value = false }) {
+    Dialog(onDismissRequest = { onDismiss() }) {
         Column(modifier) {
             Text(
                 text = "Select ${if (typeDir.value) "Directory to Extract" else "Payload.bin"}:",
@@ -111,8 +109,7 @@ fun SelectPayload(
                         } else {
                             if (file.startsWith("fl:")) {
                                 FileButton(file, fileModifier.clickable(true, onClick = {
-                                    payload.value = "${currentPath.value}/${file.removePrefix("fl:")}"
-                                    selectingPayload.value = false
+                                    onSelect("${currentPath.value}/${file.removePrefix("fl:")}")
                                 }))
                             } else {
                                 FolderButton(file, currentPath, fileModifier)
@@ -135,8 +132,7 @@ fun SelectPayload(
                             .padding(10.dp)
                             .background(Color(0x336666ff), shape = RoundedCornerShape(6.dp))
                             .clickable {
-                                outputDirectory.value = currentPath.value
-                                selectingPayload.value = false
+                                onSelect(currentPath.value)
                             }
                     ) {
                         Text(if (File(currentPath.value).canWrite()) "Extract Here" else "No Write Access", fontSize = 18.sp, modifier = Modifier.padding(8.dp))

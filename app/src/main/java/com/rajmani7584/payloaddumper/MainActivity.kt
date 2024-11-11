@@ -1,9 +1,13 @@
 package com.rajmani7584.payloaddumper
 
+import android.Manifest
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
+import android.provider.Settings
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -92,7 +96,7 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun setupOutDir(outDir: String, counter: Int): String {
-        val appDirectory = File("$externalStoragePath/PayloadDumperAndroid${if (counter == 0) "" else "(${counter})"}")
+        val appDirectory = File("$outDir${if (counter == 0) "" else "(${counter})"}")
         if (!appDirectory.exists()) {
             appDirectory.mkdirs()
         } else {
@@ -107,38 +111,38 @@ class MainActivity : ComponentActivity() {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             Environment.isExternalStorageManager()
         } else {
-            checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE) == android.content.pm.PackageManager.PERMISSION_GRANTED
+            checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
         }
     }
     private fun requestPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            val intent = Intent(android.provider.Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION)
+            val intent = Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION)
             intent.addCategory("android.intent.category.DEFAULT")
-            intent.data = android.net.Uri.parse("package:$packageName")
+            intent.data = Uri.parse("package:$packageName")
             startActivity(intent)
         } else {
-            if (!shouldShowRequestPermissionRationale(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-                val intent = Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
-                val uri = android.net.Uri.fromParts("package", packageName, null)
+            if (!shouldShowRequestPermissionRationale(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+                val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+                val uri = Uri.fromParts("package", packageName, null)
                 intent.data = uri
                 startActivity(intent)
-            } else requestPermissions(arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE), 1)
+            } else requestPermissions(arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), 1)
         }
     }
 
     @Composable
     fun AppLayout() {
 
-        val selectingPayload = remember { mutableStateOf(false) }
+        var selectingPayload by remember { mutableStateOf(false) }
         var partitionsList by remember { mutableStateOf(emptyList<Pair<String, Float>>()) }
         val typeDir = remember { mutableStateOf(false) }
-        val fileToExtract = remember { mutableStateOf("") }
-        val outputDirectory = remember { mutableStateOf(outDir) }
+        var fileToExtract by remember { mutableStateOf("") }
+        var outputDirectory by remember { mutableStateOf(outDir) }
         var listOutput by remember { mutableStateOf("") }
 
-        LaunchedEffect(fileToExtract.value) {
-            if (fileToExtract.value.isEmpty()) return@LaunchedEffect
-            val output = getPartitionList(fileToExtract.value)
+        LaunchedEffect(fileToExtract) {
+            if (fileToExtract.isEmpty()) return@LaunchedEffect
+            val output = getPartitionList(fileToExtract)
             if (output.startsWith("Err:")) {
                 listOutput = output
                 return@LaunchedEffect
@@ -168,12 +172,12 @@ class MainActivity : ComponentActivity() {
                 ) {
                     Text("Payload:", color = Color.Cyan, fontSize = 12.sp)
                     Text(
-                        if (fileToExtract.value.isEmpty()) "Select payload to extract" else fileToExtract.value,
+                        if (fileToExtract.isEmpty()) "Select payload to extract" else fileToExtract,
                         fontSize = 16.sp
                     )
                 }
                 Button(onClick = {
-                    selectingPayload.value = true
+                    selectingPayload = true
                     typeDir.value = false
                 }) { Text("Select Payload") }
             }
@@ -185,10 +189,10 @@ class MainActivity : ComponentActivity() {
                         .weight(1f)
                 ) {
                     Text("Output Directory", color = Color.Cyan, fontSize = 12.sp)
-                    Text(outputDirectory.value, fontSize = 16.sp)
+                    Text(outputDirectory, fontSize = 16.sp)
                 }
                 Button(onClick = {
-                    selectingPayload.value = true
+                    selectingPayload = true
                     typeDir.value = true
                 }) { Text("Select Directory") }
             }
@@ -216,8 +220,8 @@ class MainActivity : ComponentActivity() {
                             var status by remember { mutableStateOf("idle") }
                             var newPartitionName by remember { mutableStateOf(partitionName) }
 
-                            LaunchedEffect(partitionName, outputDirectory.value) {
-                                newPartitionName = setupPartitionName(outputDirectory.value, partitionName, 0)
+                            LaunchedEffect(partitionName, outputDirectory) {
+                                newPartitionName = setupPartitionName(outputDirectory, partitionName, 0)
                             }
 
                             Text(newPartitionName, modifier = Modifier.padding(start = 4.dp))
@@ -232,12 +236,12 @@ class MainActivity : ComponentActivity() {
                             }
                             Button(enabled = status != "Extracting...", onClick = {
                                 status = "Extracting..."
+                                outputDirectory = setupOutDir(outputDirectory, 0)
                                 CoroutineScope(Dispatchers.IO).launch {
-                                    outputDirectory.value = setupOutDir(outputDirectory.value, 0)
                                     val res = extractPartition(
-                                        fileToExtract.value,
+                                        fileToExtract,
                                         partitionName,
-                                        "${outputDirectory.value}/$newPartitionName"
+                                        "${outputDirectory}/$newPartitionName"
                                     )
                                     withContext(Dispatchers.Main) {
                                         status = res
@@ -253,19 +257,23 @@ class MainActivity : ComponentActivity() {
 
             val dirPath = externalStoragePath
             val currentPath = remember { mutableStateOf(dirPath) }
-            if (selectingPayload.value)
+            if (selectingPayload)
                 SelectPayload(
-                    typeDir, currentPath, dirPath,
-                    outputDirectory,
-                    fileToExtract,
-                    selectingPayload,
+                    currentPath,
+                    typeDir,
                     Modifier
                         .height((resources.displayMetrics.heightPixels / 2).dp)
                         .width((resources.displayMetrics.widthPixels / 2).dp)
                         .background(
                             Color.White,
                             shape = RoundedCornerShape(16.dp)
-                        )
+                        ),
+                    onSelect = { path ->
+                        if (typeDir.value) outputDirectory = path
+                        else fileToExtract = path
+                        selectingPayload = false
+                    },
+                    onDismiss = { selectingPayload = false }
                 )
         }
     }
