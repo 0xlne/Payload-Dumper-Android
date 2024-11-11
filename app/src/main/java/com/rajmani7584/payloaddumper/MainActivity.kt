@@ -216,7 +216,7 @@ class MainActivity : ComponentActivity() {
                             var status by remember { mutableStateOf("idle") }
                             var newPartitionName by remember { mutableStateOf(partitionName) }
 
-                            LaunchedEffect(partitionName) {
+                            LaunchedEffect(partitionName, outputDirectory.value) {
                                 newPartitionName = setupPartitionName(outputDirectory.value, partitionName, 0)
                             }
 
