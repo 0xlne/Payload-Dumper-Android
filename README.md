@@ -2,22 +2,12 @@
 <img src="https://github.com/rajmani7584/Payload-Dumper-Android/blob/main/app/src/main/ic_launcher-playstore.png?raw=true"/>
 Payload Dumper App for Android
 
-## Currently app is working
-
-### But i've not tested it completely
-### #library compiled only for arm64 for now
-
->### <s>May not extract some partition correctly</s>
-
-> Use extracted partition only for ref/study
-
-> do not use it with real device not atleast for now
-
+### I've not tested it completely
 
 ## # TODO
 + Add progress bar
-+ Add hashing to check extracted images integrity
-+ Add more architectures
++ <s>Add hashing to check extracted images integrity</s> (Added)
++ <s>Add more architectures</s> (Added)
 + Add support to extract from zip file (currently payload.bin only is supported)
 
 ## Thanks to <a href="https://github.com/ssut/payload-dumper-go">ssut/payload-dumper-go</a>
