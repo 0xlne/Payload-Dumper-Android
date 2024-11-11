@@ -19,7 +19,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -39,25 +38,29 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.rajmani7584.payloaddumper.ui.theme.PayloadDumperAndroidTheme
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
-import kotlin.concurrent.thread
 
 class MainActivity : ComponentActivity() {
 
     private external fun getPartitionList(path: String): String
-    private external fun extractPartition(path: String, partition: String, outputPath: String): String
+    private external fun extractPartition(
+        path: String,
+        partition: String,
+        outputPath: String
+    ): String
+
     val externalStoragePath = Environment.getExternalStorageDirectory().absolutePath
+    var outDir = "$externalStoragePath/PayloadDumperAndroid"
     var requestCounter by mutableIntStateOf(0)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        val appDirectory = File("$externalStoragePath/PayloadDumperAndroid")
-        if (!appDirectory.exists()) appDirectory.mkdir()
-        if (!appDirectory.isDirectory) {
-            appDirectory.deleteRecursively()
-            appDirectory.mkdir()
-        }
+        outDir = setupOutDir(outDir, 0)
         setContent {
 
             var hasPermission by remember { mutableStateOf(hasPermission()) }
@@ -68,7 +71,13 @@ class MainActivity : ComponentActivity() {
 
             PayloadDumperAndroidTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Column (Modifier.padding(innerPadding).fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
+                    Column(
+                        Modifier
+                            .padding(innerPadding)
+                            .fillMaxSize(),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
                         if (hasPermission) AppLayout()
                         else Button(onClick = {
                             requestPermission()
@@ -80,6 +89,18 @@ class MainActivity : ComponentActivity() {
             }
         }
 
+    }
+
+    private fun setupOutDir(outDir: String, counter: Int): String {
+        val appDirectory = File("$externalStoragePath/PayloadDumperAndroid${if (counter == 0) "" else "(${counter})"}")
+        if (!appDirectory.exists()) {
+            appDirectory.mkdirs()
+        } else {
+            if (!appDirectory.isDirectory) {
+                return setupOutDir(outDir, counter + 1)
+            }
+        }
+        return appDirectory.absolutePath
     }
 
     private fun hasPermission(): Boolean {
@@ -112,7 +133,7 @@ class MainActivity : ComponentActivity() {
         var partitionsList by remember { mutableStateOf(emptyList<Pair<String, Float>>()) }
         val typeDir = remember { mutableStateOf(false) }
         val fileToExtract = remember { mutableStateOf("") }
-        val outputDirectory = remember { mutableStateOf("$externalStoragePath/PayloadDumperAndroid") }
+        val outputDirectory = remember { mutableStateOf(outDir) }
         var listOutput by remember { mutableStateOf("") }
 
         LaunchedEffect(fileToExtract.value) {
@@ -139,9 +160,17 @@ class MainActivity : ComponentActivity() {
                 .padding(14.dp)
                 .fillMaxSize()
         ) {
-            Row {
-                Box(Modifier.width(0.dp).weight(1f)) {
-                    Text(if (fileToExtract.value.isEmpty()) "Select payload to extract" else fileToExtract.value, fontSize = 16.sp)
+            Row (verticalAlignment = Alignment.CenterVertically) {
+                Column(
+                    Modifier
+                        .width(0.dp)
+                        .weight(1f)
+                ) {
+                    Text("Payload:", color = Color.Cyan, fontSize = 12.sp)
+                    Text(
+                        if (fileToExtract.value.isEmpty()) "Select payload to extract" else fileToExtract.value,
+                        fontSize = 16.sp
+                    )
                 }
                 Button(onClick = {
                     selectingPayload.value = true
@@ -149,8 +178,13 @@ class MainActivity : ComponentActivity() {
                 }) { Text("Select Payload") }
             }
             Spacer(Modifier.height(4.dp))
-            Row {
-                Box(Modifier.width(0.dp).weight(1f)) {
+            Row (verticalAlignment = Alignment.CenterVertically) {
+                Column(
+                    Modifier
+                        .width(0.dp)
+                        .weight(1f)
+                ) {
+                    Text("Output Directory", color = Color.Cyan, fontSize = 12.sp)
                     Text(outputDirectory.value, fontSize = 16.sp)
                 }
                 Button(onClick = {
@@ -160,39 +194,56 @@ class MainActivity : ComponentActivity() {
             }
 
             if (listOutput.startsWith("Err:")) {
-                Text(listOutput)
-            }
-            else {
+                Text(listOutput, color = Color.Red)
+            } else {
                 Column(
                     Modifier
                         .fillMaxWidth()
-                        .padding(8.dp)
+                        .padding(4.dp)
                         .background(Color(0x34898989), shape = RoundedCornerShape(12.dp))
                         .verticalScroll(rememberScrollState(0))
                 ) {
-                    Text("Images already exists will be override!", color = Color.Red, modifier = Modifier.padding(start = 8.dp))
                     for ((partitionName, partitionSize) in partitionsList) {
-//                        val (partitionName, partitionSize) = partitionsList[index]
-                        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(top = 4.dp, start = 6.dp, end = 6.dp).background(Color(
-                            0x56C0DDF3
-                        ), shape = RoundedCornerShape(12.dp))) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically, modifier = Modifier
+                                .padding(4.dp)
+                                .background(
+                                    Color(
+                                        0x56C0DDF3
+                                    ), shape = RoundedCornerShape(12.dp)
+                                )
+                        ) {
                             var status by remember { mutableStateOf("idle") }
-                            Text(partitionName, fontSize = 16.sp)
-                            Column (Modifier.weight(1f).horizontalScroll(rememberScrollState(0)), horizontalAlignment = Alignment.End) {
-                                Text("Size: $partitionSize KB", fontSize = 16.sp)
+                            var newPartitionName by remember { mutableStateOf(partitionName) }
+
+                            LaunchedEffect(partitionName) {
+                                newPartitionName = setupPartitionName(outputDirectory.value, partitionName, 0)
+                            }
+
+                            Text(newPartitionName, modifier = Modifier.padding(start = 4.dp))
+                            Column(
+                                Modifier
+                                    .weight(1f)
+                                    .horizontalScroll(rememberScrollState(0)),
+                                horizontalAlignment = Alignment.End
+                            ) {
+                                Text("Size: ${parseSize(partitionSize)}", fontSize = 14.sp)
                                 Text("Status: $status", fontSize = 16.sp)
                             }
-                            Button(onClick = {
-                                thread {
-                                    status = "Extracting..."
+                            Button(enabled = status != "Extracting...", onClick = {
+                                status = "Extracting..."
+                                CoroutineScope(Dispatchers.IO).launch {
+                                    outputDirectory.value = setupOutDir(outputDirectory.value, 0)
                                     val res = extractPartition(
                                         fileToExtract.value,
                                         partitionName,
-                                        "${outputDirectory.value}/$partitionName.img"
+                                        "${outputDirectory.value}/$newPartitionName"
                                     )
-                                    status = res
+                                    withContext(Dispatchers.Main) {
+                                        status = res
+                                    }
                                 }
-                            }) {
+                            }, modifier = Modifier.padding(end = 4.dp)) {
                                 Text("Extract")
                             }
                         }
@@ -216,6 +267,28 @@ class MainActivity : ComponentActivity() {
                             shape = RoundedCornerShape(16.dp)
                         )
                 )
+        }
+    }
+
+    private fun setupPartitionName(
+        outputDirectory: String,
+        partitionName: String,
+        counter: Int
+    ): String {
+        val partition = File(outputDirectory, "${partitionName}${if (counter == 0) "" else "(${counter})"}.img")
+        return if (!partition.exists()) {
+            partition.name
+        } else {
+            setupPartitionName(outputDirectory, partitionName, counter + 1)
+        }
+    }
+
+    private fun parseSize(size: Float): String {
+        return when (size) {
+            in 0f..1000f -> "%.2f KB".format(size)
+            in 1000f..1000000f -> "%.2f MB".format(size / 1000f)
+            in 1000000f..1000000000f -> "%.2f GB".format(size / 1000000f)
+            else -> "$size KB"
         }
     }
 
