@@ -1,8 +1,8 @@
-# Payload-Dumper-Android
-<img src="https://github.com/rajmani7584/Payload-Dumper-Android/blob/main/app/src/main/ic_launcher-playstore.png?raw=true"/>
+<p align="center"><b></b>Payload-Dumper-Android</b><br/>
+<img style="height: 10%" src="https://github.com/rajmani7584/Payload-Dumper-Android/blob/main/app/src/main/ic_launcher-playstore.png?raw=true" alt="Launcher Icon"/></p>
 Payload Dumper App for Android
 
-### I've not tested it completely
+### Tested on <a href="https://www.projectmatrixx.org/">MatrixxOS</a> for Nothing Phone 1 (Spacewar)
 
 ## # TODO
 + Add progress bar
