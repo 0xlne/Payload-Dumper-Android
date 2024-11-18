@@ -20,4 +20,4 @@
 
 - most of code is borrowed from here and then converted to rust
 
-### Library for `libpayload-dumper-rust` is <a href="https://github.com/rajmani7584/libpayload-dumper-android-rust">here</a>
+### Source for `libpayload-dumper-rust` is <a href="https://github.com/rajmani7584/payload-dumper-android-rust">here</a>
