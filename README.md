@@ -4,7 +4,7 @@
 <br/>
 <img height="300" src="./app/src/main/ic_launcher-playstore.png" alt="Launcher Icon"/>
 
-### Payload Dumper App for Android
+### An OTA Extractor App for Android
 
 </div>
 
@@ -24,4 +24,4 @@
 + Add support to extract from zip file (currently payload.bin only is supported)
 
 ## Sources
-+ https://github.com/rajmani7584/libpayload-dumper-android-rust
++ https://github.com/rajmani7584/payload-dumper-android-rust
