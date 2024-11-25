@@ -10,7 +10,8 @@
 
 ### Screenshot:
 
-<img width="300px" src="./screenshots/Screenshot_20241118-103500.png" />
+<img width="300px" src="./screenshots/screenshot-1.png" />
+<img width="300px" src="./screenshots/screenshot-2.png"/>
 
 ### Tested on <a href="https://www.projectmatrixx.org/">MatrixxOS</a> for Nothing Phone 1 (Spacewar)
 
