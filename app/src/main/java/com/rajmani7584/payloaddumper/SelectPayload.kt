@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -25,6 +26,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
@@ -37,8 +39,8 @@ import java.io.File
 @Composable
 fun SelectPayload(
     currentPath: MutableState<String>,
-    typeDir: MutableState<Boolean>,
-    modifier: Modifier,
+    typeDir: Boolean,
+    modifier: Modifier = Modifier,
     onSelect: (String) -> Unit,
     onDismiss: () -> Unit
 ) {
@@ -48,7 +50,6 @@ fun SelectPayload(
         .fillMaxWidth()
         .background(Color(0x33aaaaaa), shape = RoundedCornerShape(12.dp))
 
-    // Use SnapshotStateList for incremental loading
     val fileList = remember { mutableStateListOf<String>() }
     var canGoBack by remember { mutableStateOf(true) }
 
@@ -65,7 +66,7 @@ fun SelectPayload(
                 allFiles.forEach { file ->
                     if (file.isDirectory) {
                         folders.add(file.name)
-                    } else if (!typeDir.value && file.extension == "bin") {
+                    } else if (!typeDir && file.extension == "bin") {
                         files.add("fl:${file.name}")
                     }
                 }
@@ -77,7 +78,7 @@ fun SelectPayload(
     Dialog(onDismissRequest = { onDismiss() }) {
         Column(modifier) {
             Text(
-                text = "Select ${if (typeDir.value) "Directory to Extract" else "Payload.bin"}:",
+                text = "Select ${if (typeDir) "Directory to Extract" else "Payload.bin"}:",
                 fontSize = 20.sp,
                 modifier = Modifier.padding(horizontal = 15.dp, vertical = 8.dp)
             )
@@ -104,7 +105,7 @@ fun SelectPayload(
                 } else {
                     items(fileList.size) {
                         val file = fileList[it]
-                        if (typeDir.value) {
+                        if (typeDir) {
                             FolderButton(file, currentPath, fileModifier)
                         } else {
                             if (file.startsWith("fl:")) {
@@ -119,7 +120,7 @@ fun SelectPayload(
                 }
             }
 
-            if (typeDir.value) {
+            if (typeDir) {
                 Row(
                     Modifier
                         .fillMaxWidth()
@@ -155,7 +156,8 @@ fun FileButton(
         Image(
             imageVector = ImageVector.vectorResource(R.drawable.baseline_file_present_24),
             contentDescription = null,
-            modifier = Modifier.padding(horizontal = 8.dp)
+            modifier = Modifier.padding(horizontal = 8.dp),
+            colorFilter = ColorFilter.lighting(Color(0xff000000), MaterialTheme.colorScheme.onBackground)
         )
         Text(file.removePrefix("fl:"), fontSize = 14.sp)
     }
@@ -176,7 +178,8 @@ fun FolderButton(
         Image(
             imageVector = ImageVector.vectorResource(id = R.drawable.baseline_folder_24),
             contentDescription = null,
-            modifier = Modifier.padding(horizontal = 8.dp)
+            modifier = Modifier.padding(horizontal = 8.dp),
+            colorFilter = ColorFilter.lighting(Color(0xff000000), MaterialTheme.colorScheme.onBackground)
         )
         Text(file, fontSize = 14.sp)
     }

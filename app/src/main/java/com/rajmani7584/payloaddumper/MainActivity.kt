@@ -1,20 +1,13 @@
 package com.rajmani7584.payloaddumper
 
-import android.Manifest
-import android.content.Intent
-import android.content.pm.PackageManager
-import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.os.Environment
-import android.provider.Settings
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
-import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -22,55 +15,55 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.rajmani7584.payloaddumper.ui.theme.PayloadDumperAndroidTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
 
 class MainActivity : ComponentActivity() {
 
-    private external fun getPartitionList(path: String): String
-    private external fun extractPartition(
-        path: String,
-        partition: String,
-        outputPath: String
-    ): String
-
     val externalStoragePath = Environment.getExternalStorageDirectory().absolutePath
-    var outDir = "$externalStoragePath/PayloadDumperAndroid"
-    var requestCounter by mutableIntStateOf(0)
+    private var requestCounter by mutableIntStateOf(0)
+    val utils = Utils(this)
+    val payload = Payload()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        outDir = setupOutDir(outDir, 0)
         setContent {
-
-            var hasPermission by remember { mutableStateOf(hasPermission()) }
+            var hasPermission by remember { mutableStateOf(false) }
 
             LaunchedEffect(requestCounter) {
-                hasPermission = hasPermission()
+                hasPermission = utils.hasPermission()
             }
 
             PayloadDumperAndroidTheme {
@@ -78,233 +71,210 @@ class MainActivity : ComponentActivity() {
                     Column(
                         Modifier
                             .padding(innerPadding)
-                            .fillMaxSize(),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
+                            .fillMaxSize()
                     ) {
-                        if (hasPermission) AppLayout()
-                        else Button(onClick = {
-                            requestPermission()
-                        }) {
-                            Text("Allow file access")
+                        Text("Incremental OTA not supported!", fontSize = 14.sp, modifier = Modifier.background(
+                            MaterialTheme.colorScheme.background, RoundedCornerShape(12.dp)).fillMaxWidth().padding(start = 10.dp, end = 10.dp), color = MaterialTheme.colorScheme.error, textAlign = TextAlign.Center)
+                        Column(
+                            Modifier
+                                .fillMaxSize()
+                                .padding(start = 10.dp, end = 10.dp, bottom = 6.dp)
+                                .background(
+                                    color = if (isSystemInDarkTheme()) Color(0xFF283131) else Color(
+                                        0xFFe0faff
+                                    ), shape = RoundedCornerShape(12.dp)
+                                ),
+                            verticalArrangement = Arrangement.Center,
+                            horizontalAlignment = Alignment.CenterHorizontally) {
+                            if (hasPermission) AppLayout()
+                            else Button(onClick = {
+                                utils.requestPermission()
+                            }) {
+                                    Text("Allow file access")
+                                }
                         }
                     }
                 }
             }
         }
 
-    }
-
-    private fun setupOutDir(outDir: String, counter: Int): String {
-        val appDirectory = File("$outDir${if (counter == 0) "" else "(${counter})"}")
-        if (!appDirectory.exists()) {
-            appDirectory.mkdirs()
-        } else {
-            if (!appDirectory.isDirectory) {
-                return setupOutDir(outDir, counter + 1)
-            }
-        }
-        return appDirectory.absolutePath
-    }
-
-    private fun hasPermission(): Boolean {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            Environment.isExternalStorageManager()
-        } else {
-            checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
-        }
-    }
-    private fun requestPermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            val intent = Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION)
-            intent.addCategory("android.intent.category.DEFAULT")
-            intent.data = Uri.parse("package:$packageName")
-            startActivity(intent)
-        } else {
-            if (!shouldShowRequestPermissionRationale(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-                val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
-                val uri = Uri.fromParts("package", packageName, null)
-                intent.data = uri
-                startActivity(intent)
-            } else requestPermissions(arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), 1)
-        }
     }
 
     @Composable
     fun AppLayout() {
+        val payloadFile = remember { mutableStateOf("") }
+        val outDir = remember { mutableStateOf(utils.outDir) }
+        val currentPath = remember { mutableStateOf(externalStoragePath) }
+        var typeDir by remember { mutableStateOf(false) }
+        var showSelectPayload by remember { mutableStateOf(false) }
+        var partitions by remember { mutableStateOf(listOf<Pair<String, Float>>()) }
+        var error by remember { mutableStateOf("") }
 
-        var selectingPayload by remember { mutableStateOf(false) }
-        var partitionsList by remember { mutableStateOf(emptyList<Pair<String, Float>>()) }
-        val typeDir = remember { mutableStateOf(false) }
-        var fileToExtract by remember { mutableStateOf("") }
-        var outputDirectory by remember { mutableStateOf(outDir) }
-        var listOutput by remember { mutableStateOf("") }
-
-        LaunchedEffect(fileToExtract) {
-            if (fileToExtract.isEmpty()) return@LaunchedEffect
-            val output = getPartitionList(fileToExtract)
-            if (output.startsWith("Err:")) {
-                listOutput = output
-                return@LaunchedEffect
-            }
-
-            // Parsing "partitionName|sizeInMB" format
-            partitionsList = output.removePrefix("Partitions:").trim().split(",").mapNotNull { partition ->
-                val parts = partition.split("|")
-                if (parts.size == 2) {
-                    val name = parts[0].trim()
-                    val size = parts[1].toFloatOrNull()?.div(1000) ?: 0f
-                    name to size
-                } else null
-            }
-        }
-
-        Column(
-            Modifier
-                .padding(14.dp)
-                .fillMaxSize()
-        ) {
-            Row (verticalAlignment = Alignment.CenterVertically) {
-                Column(
-                    Modifier
-                        .width(0.dp)
-                        .weight(1f)
-                ) {
-                    Text("Payload:", color = Color.Cyan, fontSize = 12.sp)
-                    Text(
-                        if (fileToExtract.isEmpty()) "Select payload to extract" else fileToExtract,
-                        fontSize = 16.sp
-                    )
-                }
-                Button(onClick = {
-                    selectingPayload = true
-                    typeDir.value = false
-                }) { Text("Select Payload") }
-            }
-            Spacer(Modifier.height(4.dp))
-            Row (verticalAlignment = Alignment.CenterVertically) {
-                Column(
-                    Modifier
-                        .width(0.dp)
-                        .weight(1f)
-                ) {
-                    Text("Output Directory", color = Color.Cyan, fontSize = 12.sp)
-                    Text(outputDirectory, fontSize = 16.sp)
-                }
-                Button(onClick = {
-                    selectingPayload = true
-                    typeDir.value = true
-                }) { Text("Select Directory") }
-            }
-
-            if (listOutput.startsWith("Err:")) {
-                Text(listOutput, color = Color.Red)
-            } else {
-                Column(
-                    Modifier
-                        .fillMaxWidth()
-                        .padding(4.dp)
-                        .background(Color(0x34898989), shape = RoundedCornerShape(12.dp))
-                        .verticalScroll(rememberScrollState(0))
-                ) {
-                    for ((partitionName, partitionSize) in partitionsList) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically, modifier = Modifier
-                                .padding(4.dp)
-                                .background(
-                                    Color(
-                                        0x56C0DDF3
-                                    ), shape = RoundedCornerShape(12.dp)
-                                )
-                        ) {
-                            var status by remember { mutableStateOf("idle") }
-                            var newPartitionName by remember { mutableStateOf(partitionName) }
-
-                            LaunchedEffect(partitionName, outputDirectory) {
-                                newPartitionName = setupPartitionName(outputDirectory, partitionName, 0)
-                            }
-
-                            Text(newPartitionName, modifier = Modifier.padding(start = 4.dp))
-                            Column(
-                                Modifier
-                                    .weight(1f)
-                                    .horizontalScroll(rememberScrollState(0)),
-                                horizontalAlignment = Alignment.End
-                            ) {
-                                Text("Size: ${parseSize(partitionSize)}", fontSize = 14.sp)
-                                Text("Status: $status", fontSize = 16.sp)
-                            }
-                            Button(enabled = status != "Extracting...", onClick = {
-                                status = "Extracting..."
-                                outputDirectory = setupOutDir(outputDirectory, 0)
-                                CoroutineScope(Dispatchers.IO).launch {
-                                    val res = extractPartition(
-                                        fileToExtract,
-                                        partitionName,
-                                        "${outputDirectory}/$newPartitionName"
-                                    )
-                                    withContext(Dispatchers.Main) {
-                                        status = res
-                                    }
-                                }
-                            }, modifier = Modifier.padding(end = 4.dp)) {
-                                Text("Extract")
-                            }
-                        }
+        LaunchedEffect(payloadFile.value) {
+            if (payloadFile.value.isEmpty()) return@LaunchedEffect
+            partitions = emptyList()
+            CoroutineScope(Dispatchers.IO).launch {
+                payload.getPartitions(payloadFile.value).let {
+                    if (it.isSuccess) {
+                        partitions = it.getOrElse { emptyList() }
+                        error = ""
+                    } else {
+                        partitions = emptyList()
+                        error = it.exceptionOrNull()?.message ?: "Unknown Error"
                     }
                 }
             }
+        }
 
-            val dirPath = externalStoragePath
-            val currentPath = remember { mutableStateOf(dirPath) }
-            if (selectingPayload)
-                SelectPayload(
-                    currentPath,
-                    typeDir,
-                    Modifier
-                        .height((resources.displayMetrics.heightPixels / 2).dp)
-                        .width((resources.displayMetrics.widthPixels / 2).dp)
-                        .background(
-                            Color.White,
-                            shape = RoundedCornerShape(16.dp)
-                        ),
-                    onSelect = { path ->
-                        if (typeDir.value) outputDirectory = path
-                        else fileToExtract = path
-                        selectingPayload = false
-                    },
-                    onDismiss = { selectingPayload = false }
-                )
+        Column (
+            Modifier
+                .fillMaxSize()
+                .padding(8.dp)) {
+            Column {
+                Row (verticalAlignment = Alignment.CenterVertically) {
+                    Column(Modifier.weight(1f)) {
+                        Text("Payload File: ", color = Color(0xffff66ff), fontSize = 14.sp)
+                        Text(payloadFile.value.let { if (it.isEmpty()) "Select a Payload to Extract" else it })
+                    }
+                    Button(onClick = {
+                        typeDir = false
+                        showSelectPayload = true
+                    }) {
+                        Text("Select Payload")
+                    }
+                }
+                Row (verticalAlignment = Alignment.CenterVertically) {
+                    Column(Modifier.weight(1f)) {
+                        Text("Output Directory: ", color = Color(0xffff66ff), fontSize = 14.sp)
+                        Text(outDir.value.let { if (it.isEmpty()) "Select an Output Directory" else it })
+                    }
+                    Button(onClick = {
+                        typeDir = true
+                        showSelectPayload = true
+                    }) {
+                        Text("Select Directory")
+                    }
+                }
+            }
+            Spacer(Modifier.height(8.dp))
+            Column (
+                Modifier
+                    .weight(1f)
+                    .fillMaxWidth()
+                    .verticalScroll(rememberScrollState(0))) {
+                if (error.isNotEmpty()) Text(error, color = Color.Red, fontSize = 18.sp)
+                if (partitions.isNotEmpty()) {
+                    for (partition in partitions) {
+                        Card (
+                            elevation = CardDefaults.cardElevation(4.dp)
+                        ) {
+                            Column (Modifier
+                                .background(
+                                    Color(if (isSystemInDarkTheme()) 0x23ba98bc else 0xffffffff),
+                                    shape = RoundedCornerShape(12.dp)
+                                )
+                                .padding(12.dp)) {
+                                PartitionCard(partition, payloadFile, outDir)
+                            }
+                        }
+                        Spacer(Modifier.height(12.dp))
+                    }
+                }
+            }
+        }
+        if (showSelectPayload) SelectPayload(
+            currentPath,
+            typeDir,
+            Modifier
+                .padding(top = 20.dp, bottom = 20.dp)
+                .background(MaterialTheme.colorScheme.background, RoundedCornerShape(8.dp)),
+            onSelect = {
+                showSelectPayload = false
+                if (typeDir) {
+                    outDir.value = it
+                } else {
+                    payloadFile.value = it
+                }
+        }, onDismiss = {
+            showSelectPayload = false
+        })
+    }
+
+    @Composable
+    fun PartitionCard(partition: Pair<String, Float>, payloadFile: MutableState<String>, outDir: MutableState<String>) {
+
+        var progress by remember { mutableLongStateOf(0) }
+        var warning by remember { mutableStateOf("") }
+        var inProgress by remember { mutableStateOf(false) }
+        var newPartitionName by remember { mutableStateOf("") }
+
+        LaunchedEffect(outDir.value, payloadFile.value, requestCounter) {
+            if (outDir.value.isEmpty()) return@LaunchedEffect
+            newPartitionName = utils.setupPartitionName(outDir.value, partition.first, 0)
+            warning = ""
+            progress = 0
+            inProgress = false
+            if (newPartitionName != partition.first) {
+                warning = "${partition.first}.img already exists\nwill be renamed to $newPartitionName"
+            }
+        }
+
+        Row {
+            Column {
+                Text(partition.first, fontSize = 18.sp)
+                Text(utils.parseSize(partition.second), fontSize = 18.sp)
+            }
+            Spacer(Modifier.weight(1f))
+            Button(enabled = !inProgress, onClick = {
+                inProgress = true
+                warning = ""
+                progress = 0
+                val outDirectory = utils.setupOutDir(outDir.value, 0)
+                val output = "$outDirectory/$newPartitionName.img"
+                CoroutineScope(Dispatchers.IO).launch {
+                    val result = payload.extract(payloadFile.value, partition.first, output) {
+                        progress = it
+                    }
+                    withContext(Dispatchers.Main) {
+                        if (result.isSuccess) {
+                            warning = "success$output"
+                        } else {
+                            inProgress = false
+                            progress = 0
+                            warning = result.exceptionOrNull()?.message ?: "Unknown Error"
+                            this.cancel()
+                            File(newPartitionName).apply { if (exists()) delete() }
+                        }
+                    }
+                }
+            }) { Text("Extract") }
+        }
+        Column {
+            if (progress > 0f)
+                Column {
+                    Row {
+                        Spacer(Modifier.weight(1f))
+                        Text("$progress%", color = Color(0xffff66ff), fontSize = 14.sp)
+                    }
+                    @Suppress("DEPRECATION")
+                    LinearProgressIndicator(
+                        progress.toFloat() / 100,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(10.dp),
+                        color = Color.Green,
+                        trackColor = Color.Red,
+                        strokeCap = StrokeCap.Round
+                    )
+                }
+            if (warning.isNotEmpty()) Text(
+                if (warning.startsWith("success"))
+                    "Done: ${warning.removePrefix("success")}"
+                    else warning,
+                color = if (warning.startsWith("success")) Color(0xff003388) else MaterialTheme.colorScheme.error)
         }
     }
 
-    private fun setupPartitionName(
-        outputDirectory: String,
-        partitionName: String,
-        counter: Int
-    ): String {
-        val partition = File(outputDirectory, "${partitionName}${if (counter == 0) "" else "(${counter})"}.img")
-        return if (!partition.exists()) {
-            partition.name
-        } else {
-            setupPartitionName(outputDirectory, partitionName, counter + 1)
-        }
-    }
-
-    private fun parseSize(size: Float): String {
-        return when (size) {
-            in 0f..1000f -> "%.2f KB".format(size)
-            in 1000f..1000000f -> "%.2f MB".format(size / 1000f)
-            in 1000000f..1000000000f -> "%.2f GB".format(size / 1000000f)
-            else -> "$size KB"
-        }
-    }
-
-    companion object {
-        init {
-            System.loadLibrary("payload-dumper-rust")
-        }
-    }
 
     override fun onRequestPermissionsResult(
         requestCode: Int,
