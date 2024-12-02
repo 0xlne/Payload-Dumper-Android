@@ -287,12 +287,11 @@ fun PartitionCard(dataViewModel: DataViewModel, partition: Partition) {
                         2 -> "Failed!"
                         else -> ""
                     }
-                    Row (horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
-                        Text(partition.name, fontFamily = FontFamily.Monospace)
-                        Text(status, color = Color(0xFF121144), modifier = Modifier.padding(end = 6.dp))
-                    }
+                    Text(partition.name, fontFamily = FontFamily.Monospace, maxLines = 1)
                     Spacer(Modifier.height(4.dp))
                     Text("Size: ${Utils.parseSize(partition.size)}")
+                    Spacer(Modifier.height(4.dp))
+                    if (status.isNotEmpty()) Text(status, color = Color(0xFF121144), modifier = Modifier.padding(end = 6.dp), maxLines = 1)
                 }
             }
         }

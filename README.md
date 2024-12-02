@@ -2,7 +2,7 @@
 
 ### Payload-Dumper-Android
 <br/>
-<img height="300" src="./app/src/main/ic_launcher-playstore.png" alt="Launcher Icon"/>
+<img height="300px" src="./app/src/main/ic_launcher-playstore.png" alt="Launcher Icon"/>
 
 ### An OTA Extractor App for Android
 
@@ -11,8 +11,9 @@
 ### Screenshot:
 
 <div style="display: flex">
-  <img width="300px" src="./screenshots/screenshot-1.png" />
-  <img width="300px" src="./screenshots/screenshot-2.png"/>
+  <img width="280px" src="./screenshots/screenshot-1.png" />
+  <img width="280px" src="./screenshots/screenshot-2.png"/>
+  <img width="280px" src="./screenshots/screenshot-3.png"/>
 </div>
 
 ### Tested on <a href="https://www.projectmatrixx.org/">MatrixxOS</a> for Nothing Phone 1 (Spacewar)
@@ -21,7 +22,9 @@
 + <s>Add progress bar</s> (Added)
 + <s>Add hashing to check extracted images integrity</s> (Added)
 + <s>Add more architectures</s> (Added)
-+ Add support to extract from zip file (currently payload.bin only is supported)
++ <s>Add support to extract from zip file (currently payload.bin only is supported)</s> (Added)
 
-## Sources
-+ https://github.com/rajmani7584/payload-dumper-android-rust
+## Credit
++ https://github.com/rajmani7584/payload-dumper-android-rust - native library
++ https://github.com/ssut/payload-dumper-go - core of library
++ https://fonts.google.com/specimen/Doto - Dotted Font

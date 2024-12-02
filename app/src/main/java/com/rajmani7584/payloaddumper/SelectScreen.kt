@@ -2,6 +2,7 @@ package com.rajmani7584.payloaddumper
 
 import android.os.Environment
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
@@ -174,7 +175,7 @@ fun SelectScreen(
                         )
                     }
                 }
-                Box(Modifier.padding(horizontal = 6.dp)) {
+                Box(Modifier.padding(horizontal = 6.dp).background(MaterialTheme.colorScheme.surface)) {
                     LazyColumn(
                         contentPadding = PaddingValues(start = 6.dp, bottom = 25.dp),
                         verticalArrangement = Arrangement.spacedBy(2.dp),

@@ -171,6 +171,7 @@ class DataViewModel(application: Application) : AndroidViewModel(application) {
         val partitionStatus = _partitionStatus.value.filter { it.value.isSelected }
 
         _isExtracting.value = true
+        _isSelecting.value = false
 
         CoroutineScope(Dispatchers.IO).extractOnThread(
             partitionStatus,
