@@ -15,7 +15,7 @@
   <img width="280px" src="./screenshots/screenshot-2.png"/>
 </div>
 
-### Tested on <a href="https://www.projectmatrixx.org/">MatrixxOS</a> for Nothing Phone 1 (Spacewar)
+### Tested on <a href="https://www.projectmatrixx.org/">MatrixxOS</a> for Nothing Phone 1 (Spacewar) And <a href="https://xmfirmwareupdater.com/hyperos">HyperOS</a> for nabu
 
 ## # TODO
 + <s>Add progress bar</s> (Added)
