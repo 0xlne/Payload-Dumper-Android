@@ -20,6 +20,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withPermit
+import kotlinx.coroutines.withContext
 import java.io.File
 
 
@@ -105,7 +106,7 @@ class DataViewModel(application: Application) : AndroidViewModel(application) {
         _payloadInfo.value = null
         _isSelecting.value = false
         _isExtracting.value = false
-        CoroutineScope(Dispatchers.IO).launch {
+        viewModelScope.launch(Dispatchers.IO) {
             _isLoading.value = true
             _payloadError.value = null
             delay(500)
@@ -173,14 +174,16 @@ class DataViewModel(application: Application) : AndroidViewModel(application) {
         _isExtracting.value = true
         _isSelecting.value = false
 
-        CoroutineScope(Dispatchers.IO).extractOnThread(
+        viewModelScope.extractOnThread(
             partitionStatus,
             concurrency.value
         ) { name, status ->
-            extractSelected(name, status)
-            if (status.hasFailed) {
-                status.output?.let {
-                    File(it).delete()
+            withContext(Dispatchers.IO) {
+                extractSelected(name, status)
+                if (status.statusCode == 4) {
+                    status.output?.let {
+                        File(it).delete()
+                    }
                 }
             }
         }.invokeOnCompletion {
@@ -191,10 +194,10 @@ class DataViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    private fun <K, T, R> CoroutineScope.extractOnThread(
-        list: Map<K, T>,
+    private fun <K, V, F> CoroutineScope.extractOnThread(
+        list: Map<K, V>,
         thread: Int,
-        function: suspend (K, T) -> R
+        function: suspend (K, V) -> F
     ): Job {
         val semaphore = Semaphore(thread)
 
@@ -210,10 +213,6 @@ class DataViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun extractSelected(name: String, status: PartitionStatus) {
-        updatePartitionStatus(
-            name,
-            status.copy(progress = 0, hasFailed = false, isCompleted = false)
-        )
 
         payloadPath.value?.let { path ->
             val outputName = Utils.setupPartitionName(outputDirectory.value, name, 0)
@@ -228,7 +227,8 @@ class DataViewModel(application: Application) : AndroidViewModel(application) {
                         name,
                         status.copy(
                             progress = it.toInt(),
-                            message = "Extracting $name as $out ($it%)"
+                            message = "Extracting $name as $out ($it%)",
+                            statusCode = 1
                         )
                     )
                 },
@@ -236,16 +236,15 @@ class DataViewModel(application: Application) : AndroidViewModel(application) {
                     when (it) {
                         0 -> updatePartitionStatus(
                             name,
-                            status.copy(message = "Verifying", statusCode = 0)
+                            status.copy(message = "Verifying", statusCode = 2, progress = 100)
                         )
 
                         1 -> updatePartitionStatus(
                             name,
                             status.copy(
                                 message = "Extracted to $out",
-                                statusCode = 1,
-                                isCompleted = true,
-                                hasFailed = false
+                                statusCode = 3,
+                                progress = 100
                             )
                         )
 
@@ -253,9 +252,8 @@ class DataViewModel(application: Application) : AndroidViewModel(application) {
                             name,
                             status.copy(
                                 message = "Hash mismatch error!",
-                                statusCode = 2,
-                                isCompleted = false,
-                                hasFailed = true
+                                statusCode = 4,
+                                progress = 100
                             )
                         )
                     }
@@ -265,9 +263,7 @@ class DataViewModel(application: Application) : AndroidViewModel(application) {
                     name,
                     status.copy(
                         message = it.message ?: "Unknown error",
-                        statusCode = 2,
-                        isCompleted = false,
-                        hasFailed = true
+                        statusCode = 4
                     )
                 )
             }

@@ -1,12 +1,18 @@
 package com.rajmani7584.payloaddumper
 
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.horizontalScroll
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -39,7 +45,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.StrokeCap
@@ -78,9 +86,9 @@ fun ExtractScreen(navController: NavHostController, dataViewModel: DataViewModel
     val isExtracting by dataViewModel.isExtracting
     val isSelecting by dataViewModel.isSelecting
     val operations = dataViewModel.partitionStatus.value.filter { it.value.isSelected }.size
-    val completed = dataViewModel.partitionStatus.value.filter { it.value.isCompleted }.size
+    val completed = dataViewModel.partitionStatus.value.filter { it.value.statusCode == 3 }.size
 
-    val headerHeightPx = with(LocalDensity.current) { 130.dp.toPx() }
+    val headerHeightPx = with(LocalDensity.current) { 120.dp.toPx() }
     val minHeightPx = with(LocalDensity.current) { 0.dp.toPx() }
     val headerHeight = remember { mutableFloatStateOf(headerHeightPx) }
 
@@ -119,7 +127,8 @@ fun ExtractScreen(navController: NavHostController, dataViewModel: DataViewModel
                             launchSingleTop = true
                             restoreState = true
                         }
-                    }), textDecoration = TextDecoration.Underline)
+                    }), textDecoration = TextDecoration.Underline
+                )
                 LaunchedEffect(outputDirectory) {
                     scroll.animateScrollTo(scroll.maxValue)
                 }
@@ -130,7 +139,11 @@ fun ExtractScreen(navController: NavHostController, dataViewModel: DataViewModel
             Text("Signature Length: ${payload?.signatureLength}")
         }
         if (isExtracting) {
-            Column(Modifier.fillMaxWidth().padding(horizontal = 12.dp)) {
+            Column(
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 12.dp)
+            ) {
                 Text(
                     "$completed/$operations",
                     textAlign = TextAlign.End,
@@ -138,7 +151,9 @@ fun ExtractScreen(navController: NavHostController, dataViewModel: DataViewModel
                 )
                 LinearProgressIndicator(
                     completed.toFloat().div(operations),
-                    modifier = Modifier.height(4.dp).fillMaxWidth(),
+                    modifier = Modifier
+                        .height(4.dp)
+                        .fillMaxWidth(),
                     strokeCap = StrokeCap.Round,
                     trackColor = Color.LightGray,
                     color = Color(0xFF1D4CAD)
@@ -220,19 +235,21 @@ fun PartitionCard(dataViewModel: DataViewModel, partition: Partition) {
 
         val backgroundColor = when {
             it.isSelected && isSelecting -> if (isDarkTheme) Color(0xFF48474C) else Color(0xFFD1E3EE)
-            it.hasFailed -> MaterialTheme.colorScheme.errorContainer
-            it.isCompleted -> if (isDarkTheme) Color(0xFF254125) else Color(0xFFD7FDD5)
-            else -> MaterialTheme.colorScheme.surface
+            else -> when (it.statusCode) {
+                1 -> if (isDarkTheme) Color(0xFF48474C) else Color(0xFFD1E3EE) // in progress
+                3 -> if (isDarkTheme) Color(0xFF254125) else Color(0xFFD7FDD5) // completed
+                4 -> MaterialTheme.colorScheme.errorContainer //failed
+                else -> MaterialTheme.colorScheme.surface //default / verifying
+            }
         }
-
-        Box (
+        Box(
             modifier = Modifier
                 .padding(8.dp)
                 .fillMaxWidth()
                 .background(backgroundColor, RoundedCornerShape(8.dp))
                 .border(
                     1.dp,
-                    if (it.isSelected || it.isCompleted || it.hasFailed) Color.Transparent else Color.Gray,
+                    if (it.isSelected || it.statusCode != null) Color.Transparent else Color.Gray,
                     RoundedCornerShape(8.dp)
                 )
                 .pointerInput(Unit) {
@@ -268,7 +285,11 @@ fun PartitionCard(dataViewModel: DataViewModel, partition: Partition) {
                     )
                 }
         ) {
-            Box(Modifier.matchParentSize()) { Box(Modifier.fillMaxHeight().fillMaxWidth(it.progress.toFloat().div(100)).background(if (isDarkTheme) Color(0xFF254125) else Color(0xFFD7FDD5), RoundedCornerShape(8.dp))) }
+            if (it.statusCode.let { it == 1 || it == 2 }) {
+                Box(Modifier.matchParentSize()) {
+                    AnimatedProgressBarWithHighlight(it.progress.toFloat(), isDarkTheme)
+                }
+            }
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.fillMaxSize()
@@ -280,18 +301,23 @@ fun PartitionCard(dataViewModel: DataViewModel, partition: Partition) {
                     contentDescription = "Drive",
                     Modifier.padding(8.dp)
                 )
-                Column(Modifier.padding(start = 4.dp, top = 8.dp, bottom = 16.dp).fillMaxSize()) {
-                    val status = when(it.statusCode) {
-                        0 -> "Verifying..."
-                        1 -> "Complete!"
-                        2 -> "Failed!"
-                        else -> ""
-                    }
-                    Text(partition.name, fontFamily = FontFamily.Monospace, maxLines = 1)
+                Column(
+                    Modifier
+                        .padding(start = 4.dp, top = 8.dp, bottom = 16.dp)
+                        .fillMaxSize()
+                ) {
+                    Text(
+                        partition.name,
+                        fontFamily = FontFamily.Monospace,
+                        style = MaterialTheme.typography.bodyLarge,
+                        maxLines = 1
+                    )
                     Spacer(Modifier.height(4.dp))
-                    Text("Size: ${Utils.parseSize(partition.size)}")
-                    Spacer(Modifier.height(4.dp))
-                    if (status.isNotEmpty()) Text(status, color = Color(0xFF121144), modifier = Modifier.padding(end = 6.dp), maxLines = 1)
+                    Text(
+                        "Size: ${Utils.parseSize(partition.size)}",
+                        maxLines = 1,
+                        style = MaterialTheme.typography.labelMedium
+                    )
                 }
             }
         }
@@ -300,6 +326,59 @@ fun PartitionCard(dataViewModel: DataViewModel, partition: Partition) {
             it.message,
             modifier = Modifier.fillMaxWidth()
         ) { showInfo = false }
+    }
+}
+
+@Composable
+fun AnimatedProgressBarWithHighlight(
+    progress: Float = 100f,
+    isDarkTheme: Boolean
+) {
+    val backgroundColor = if (isDarkTheme) Color(0xFF254125) else Color(0xFFD7FDD5)
+    val highlightColor = if (isDarkTheme) Color(0xFF406F40) else Color(0xFFACF5A2)
+
+    val highlightWidthFraction = 0.2f // 20% of the progress bar width
+    val infiniteTransition = rememberInfiniteTransition(label = "")
+    val animatedOffset = infiniteTransition.animateFloat(
+        initialValue = 0f,
+        targetValue = 1f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(durationMillis = 1000, easing = LinearEasing),
+            repeatMode = RepeatMode.Restart,
+        ), label = ""
+    )
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth(progress.div(100))
+                .fillMaxHeight()
+                .clip(RoundedCornerShape(8.dp))
+                .background(backgroundColor)
+        )
+        Box(
+            modifier = Modifier
+                .fillMaxHeight()
+                .fillMaxWidth(progress.div(100))
+                .clip(RoundedCornerShape(8.dp))
+        ) {
+            Canvas(
+                modifier = Modifier.fillMaxSize()
+            ) {
+                val totalWidth = size.width
+                val highlightWidth = totalWidth * highlightWidthFraction
+                val highlightStart =
+                    animatedOffset.value * (totalWidth + highlightWidth) - highlightWidth
+
+                drawRect(
+                    color = highlightColor.copy(.5f),
+                    topLeft = Offset(highlightStart, 0f),
+                    size = Size(highlightWidth, size.height)
+                )
+            }
+        }
     }
 }
 

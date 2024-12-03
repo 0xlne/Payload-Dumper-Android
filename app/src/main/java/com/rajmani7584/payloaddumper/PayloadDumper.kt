@@ -67,4 +67,4 @@ class OnRustCallback(private val onProgress: (Long) -> Unit, private val onVerif
 
 data class Payload (val name: String, val version: String, val manifestLength: String, val signatureLength: String, val securityPatch: String, val partitions: List<Partition>)
 data class Partition (val name: String, val size: Float, val hash: String)
-data class PartitionStatus (val name: String, val progress: Int, val message: String, val output: String?, val statusCode: Int?, val isSelected: Boolean = false, val isCompleted: Boolean = false, val hasFailed: Boolean = false)
+data class PartitionStatus (val name: String, val progress: Int, val message: String, val output: String?, val statusCode: Int?, val isSelected: Boolean = false)

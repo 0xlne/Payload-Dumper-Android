@@ -8,12 +8,11 @@
 
 </div>
 
-### Screenshot:
+### Screenshots:
 
 <div style="display: flex">
   <img width="280px" src="./screenshots/screenshot-1.png" />
   <img width="280px" src="./screenshots/screenshot-2.png"/>
-  <img width="280px" src="./screenshots/screenshot-3.png"/>
 </div>
 
 ### Tested on <a href="https://www.projectmatrixx.org/">MatrixxOS</a> for Nothing Phone 1 (Spacewar)
@@ -23,6 +22,7 @@
 + <s>Add hashing to check extracted images integrity</s> (Added)
 + <s>Add more architectures</s> (Added)
 + <s>Add support to extract from zip file (currently payload.bin only is supported)</s> (Added)
++ Add an option to select more images while previous one still in progress
 
 ## Credit
 + https://github.com/rajmani7584/payload-dumper-android-rust - native library
