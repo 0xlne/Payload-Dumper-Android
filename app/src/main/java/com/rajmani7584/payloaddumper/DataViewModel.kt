@@ -6,6 +6,7 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.NavHostController
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -79,8 +80,9 @@ class DataViewModel(application: Application) : AndroidViewModel(application) {
     private val _isExtracting = mutableStateOf(false)
     val isExtracting: State<Boolean> = _isExtracting
 
+    val externalStorage = Environment.getExternalStorageDirectory().absolutePath
     private val _outputDirectory =
-        mutableStateOf("${Environment.getExternalStorageDirectory()}/PayloadDumperAndroid")
+        mutableStateOf("$externalStorage/PayloadDumperAndroid")
     val outputDirectory: State<String> = _outputDirectory
 
     private val _payloadError = mutableStateOf<String?>(null)
@@ -101,7 +103,7 @@ class DataViewModel(application: Application) : AndroidViewModel(application) {
     private val _payloadPath = mutableStateOf<String?>(null)
     val payloadPath: State<String?> = _payloadPath
 
-    fun initPayload(path: String) {
+    fun initPayload(path: String, navController: NavHostController) {
         _payloadPath.value = null
         _payloadInfo.value = null
         _isSelecting.value = false
@@ -121,6 +123,9 @@ class DataViewModel(application: Application) : AndroidViewModel(application) {
                     }", 0
                 )
                 initializePartitionStatus(payload.partitions)
+                viewModelScope.launch(Dispatchers.Main) {
+                    navController.navigate(Screens.EXTRACT)
+                }
             }.onFailure {
                 _payloadInfo.value = null
                 _payloadError.value = it.message
@@ -175,14 +180,14 @@ class DataViewModel(application: Application) : AndroidViewModel(application) {
         _isSelecting.value = false
 
         viewModelScope.extractOnThread(
-            partitionStatus,
+            partitionStatus.keys,
             concurrency.value
-        ) { name, status ->
+        ) { name ->
             withContext(Dispatchers.IO) {
-                extractSelected(name, status)
-                if (status.statusCode == 4) {
-                    status.output?.let {
-                        File(it).delete()
+                extractSelected(name)
+                partitionStatus[name]?.let {
+                    if (it.statusCode == 4) {
+                        it.output?.let { File(it).delete() }
                     }
                 }
             }
@@ -194,30 +199,32 @@ class DataViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    private fun <K, V, F> CoroutineScope.extractOnThread(
-        list: Map<K, V>,
+    private fun <K, F> CoroutineScope.extractOnThread(
+        list: Set<K>,
         thread: Int,
-        function: suspend (K, V) -> F
+        function: suspend (K) -> F
     ): Job {
         val semaphore = Semaphore(thread)
 
         return launch {
-            list.map { (name, status) ->
+            list.map { name ->
                 async {
                     semaphore.withPermit {
-                        function(name, status)
+                        function(name)
                     }
                 }
             }.awaitAll()
         }
     }
 
-    fun extractSelected(name: String, status: PartitionStatus) {
+    fun extractSelected(name: String) {
 
         payloadPath.value?.let { path ->
+            val status = _partitionStatus.value[name] ?: return
             val outputName = Utils.setupPartitionName(outputDirectory.value, name, 0)
             val out = "${outputDirectory.value}/$outputName.img"
-            updatePartitionStatus(name, status.copy(output = out))
+            updatePartitionStatus(name, status.copy(output = out, progress = 0, statusCode = null))
+
             val result = PayloadDumper.extract(
                 path,
                 name,

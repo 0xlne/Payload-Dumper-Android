@@ -18,6 +18,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -97,7 +99,7 @@ fun SelectScreen(
             Spacer(Modifier.height(8.dp))
             Text(
                 text = "SELECT ${if (isDir) "DIRECTORY" else "PAYLOAD"}",
-                style = MaterialTheme.typography.headlineLarge,
+                style = MaterialTheme.typography.headlineMedium,
                 fontFamily = FontFamily(Font(R.font.doto)),
                 modifier = Modifier.padding(horizontal = 12.dp)
             )
@@ -164,14 +166,14 @@ fun SelectScreen(
                         isDarkTheme = isDarkTheme,
                         modifier = Modifier.padding(bottom = 15.dp).zIndex(1f)
                             .align(Alignment.BottomCenter)
-                            .width(navController.context.resources.displayMetrics.widthPixels.dp / 4)
-                            .height(55.dp)
+                            .fillMaxWidth(.4f).wrapContentSize(unbounded = true)
                     ) {
                         Text(
-                            "Extract Here",
-                            modifier = Modifier.padding(6.dp),
-                            fontSize = 18.sp,
-                            fontFamily = FontFamily.Serif
+                            "EXTRACT HERE",
+                            modifier = Modifier.padding(vertical = 4.dp, horizontal = 12.dp),
+                            fontSize = 16.sp,
+                            maxLines = 1,
+                            fontFamily = FontFamily(Font(R.font.doto))
                         )
                     }
                 }
@@ -213,7 +215,7 @@ fun SelectScreen(
                                                     file.removePrefix(
                                                         "fl:"
                                                     )
-                                                }"
+                                                }", navController
                                             )
                                             navController.popBackStack()
                                         })) {
@@ -285,7 +287,7 @@ fun FileButton(
             modifier = Modifier.padding(horizontal = 4.dp)
         )
         Spacer(Modifier.width(5.dp))
-        Text(file.removePrefix("fl:"), style = MaterialTheme.typography.titleMedium, modifier = Modifier.padding(horizontal = 4.dp))
+        Text(file.removePrefix("fl:"), style = MaterialTheme.typography.titleSmall, modifier = Modifier.padding(horizontal = 4.dp))
     }
 }
 
@@ -304,6 +306,6 @@ fun FolderButton(
             modifier = Modifier.padding(horizontal = 4.dp)
         )
         Spacer(Modifier.width(5.dp))
-        Text(file, style = MaterialTheme.typography.titleMedium, modifier = Modifier.padding(horizontal = 4.dp))
+        Text(file, style = MaterialTheme.typography.titleSmall, modifier = Modifier.padding(horizontal = 4.dp))
     }
 }

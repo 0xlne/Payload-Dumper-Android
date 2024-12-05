@@ -21,7 +21,7 @@ object Utils {
             colors = ButtonDefaults.textButtonColors(
                 containerColor = if (isDarkTheme) Color(0xFFD7D8D8) else Color(0xFF1E2225),
                 contentColor = if (isDarkTheme) Color.Black else Color.White,
-                disabledContainerColor = Color(0x55888888)
+                disabledContainerColor = Color(0x88888888)
             )) {
             content()
         }

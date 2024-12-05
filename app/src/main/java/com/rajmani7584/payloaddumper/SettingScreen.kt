@@ -67,7 +67,7 @@ fun SettingScreen(navController: NavHostController, dataViewModel: DataViewModel
         Column {
             Text(
                 "SETTINGS",
-                style = MaterialTheme.typography.headlineLarge,
+                style = MaterialTheme.typography.headlineMedium,
                 fontFamily = FontFamily(Font(R.font.doto)),
                 modifier = Modifier.padding(horizontal = 8.dp, vertical = 16.dp)
             )

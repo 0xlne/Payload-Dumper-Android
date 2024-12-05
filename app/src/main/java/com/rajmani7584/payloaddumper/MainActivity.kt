@@ -103,6 +103,21 @@ class MainActivity : ComponentActivity() {
             composable(Screens.SETTING) {
                 SettingScreen(navController, dataViewModel)
             }
+            composable(Screens.EXTRACT, enterTransition = {
+                slideIntoContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Up,
+                    tween(250)
+                )
+            }, exitTransition = {
+                slideOutOfContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Down,
+                    tween(250)
+                )
+            }) {
+                Column {
+                    ExtractScreen(navController, dataViewModel)
+                }
+            }
             composable(
                 "${Screens.SELECTOR}/{selectDirectory}",
                 arguments = listOf(
@@ -110,23 +125,12 @@ class MainActivity : ComponentActivity() {
                 ),
                 enterTransition = {
                     slideIntoContainer(
-                        AnimatedContentTransitionScope.SlideDirection.Up,
+                        AnimatedContentTransitionScope.SlideDirection.Down,
                         tween(80)
                     )
                 }, exitTransition = {
                     slideOutOfContainer(
-                        AnimatedContentTransitionScope.SlideDirection.Down,
-                        tween(80)
-                    )
-                },
-                popEnterTransition = {
-                    slideIntoContainer(
                         AnimatedContentTransitionScope.SlideDirection.Up,
-                        tween(80)
-                    )
-                }, popExitTransition = {
-                    slideOutOfContainer(
-                        AnimatedContentTransitionScope.SlideDirection.Down,
                         tween(80)
                     )
                 }
@@ -157,5 +161,6 @@ class Screens {
         const val HOME = "home"
         const val SETTING = "settings"
         const val SELECTOR = "selector"
+        const val EXTRACT = "extract"
     }
 }

@@ -23,20 +23,31 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
@@ -62,9 +73,9 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -88,7 +99,7 @@ fun ExtractScreen(navController: NavHostController, dataViewModel: DataViewModel
     val operations = dataViewModel.partitionStatus.value.filter { it.value.isSelected }.size
     val completed = dataViewModel.partitionStatus.value.filter { it.value.statusCode == 3 }.size
 
-    val headerHeightPx = with(LocalDensity.current) { 120.dp.toPx() }
+    val headerHeightPx = with(LocalDensity.current) { 105.dp.toPx() }
     val minHeightPx = with(LocalDensity.current) { 0.dp.toPx() }
     val headerHeight = remember { mutableFloatStateOf(headerHeightPx) }
 
@@ -102,41 +113,147 @@ fun ExtractScreen(navController: NavHostController, dataViewModel: DataViewModel
             }
         }
     }
+    // Action Bar (top section)
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .padding(top = 4.dp, start = 12.dp, bottom = 4.dp, end = 16.dp)
+    ) {
+        Icon(Icons.AutoMirrored.Default.ArrowBack, contentDescription = "Go Back", Modifier.clickable { navController.popBackStack() })
+        Spacer(Modifier.weight(1f)) // Spacer to push elements to the right
+
+        // Dropdown menu and list view toggle if payload is available
+        if (payload != null) {
+            var showOpts by remember { mutableStateOf(false) }
+
+            // Options Menu (Select All, Deselect All, Invert Selections)
+            Box {
+                Icon(
+                    imageVector = ImageVector.vectorResource(R.drawable.rounded_checklist_rtl_24),
+                    contentDescription = "",
+                    Modifier.clickable(!isExtracting) { showOpts = !showOpts }
+                )
+                DropdownMenu(
+                    expanded = showOpts,
+                    onDismissRequest = { showOpts = false },
+                    modifier = Modifier
+                        .padding(4.dp)
+                        .wrapContentWidth()
+                ) {
+                    DropdownMenuItem(
+                        text = {
+                            Text(
+                                "Select All",
+                                style = MaterialTheme.typography.bodyLarge
+                            )
+                        },
+                        onClick = {
+                            dataViewModel.selectAll(true)
+                            showOpts = false
+                        }
+                    )
+                    HorizontalDivider(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f))
+                    DropdownMenuItem(
+                        text = {
+                            Text(
+                                "Deselect All",
+                                style = MaterialTheme.typography.bodyLarge
+                            )
+                        },
+                        onClick = {
+                            dataViewModel.selectAll(false)
+                            showOpts = false
+                        }
+                    )
+                    HorizontalDivider(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f))
+                    DropdownMenuItem(
+                        text = {
+                            Text(
+                                "Invert Selections",
+                                style = MaterialTheme.typography.bodyLarge
+                            )
+                        },
+                        onClick = {
+                            dataViewModel.invertSelection()
+                            showOpts = false
+                        }
+                    )
+                }
+            }
+
+            Spacer(Modifier.width(16.dp))
+
+            // Toggle between grid and list view
+            Icon(
+                imageVector = if (listView)
+                    ImageVector.vectorResource(R.drawable.rounded_grid_view_24)
+                else
+                    Icons.AutoMirrored.Default.List,
+                contentDescription = "List View",
+                Modifier.clickable { dataViewModel.setListView(!listView) }
+            )
+
+            Spacer(Modifier.width(16.dp))
+        }
+
+        // Settings Icon
+        Icon(
+            imageVector = Icons.Outlined.Settings,
+            contentDescription = "Settings",
+            Modifier.clickable { navController.navigate(Screens.SETTING) }
+        )
+    }
 
     Column(
         Modifier
             .fillMaxSize()
             .nestedScroll(scrollBehavior)
+            .padding(top = 4.dp)
     ) {
 
+        Row (modifier = Modifier.padding(start = 16.dp).wrapContentSize(), verticalAlignment = Alignment.CenterVertically) {
+            Text("Payload: ", style = MaterialTheme.typography.titleMedium)
+            Text("${payload?.name}", style = MaterialTheme.typography.titleSmall, modifier = Modifier.horizontalScroll(rememberScrollState()))
+        }
         Column(
             Modifier
                 .padding(start = 16.dp)
                 .height(with(LocalDensity.current) { headerHeight.floatValue.toDp() })
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text("Output: ")
-                val scroll = rememberScrollState(0)
-                Text(outputDirectory, modifier = Modifier
-                    .horizontalScroll(scroll)
-                    .clickable(onClick = {
-                        navController.navigate("${Screens.SELECTOR}/true") {
-                            popUpTo(Screens.HOME) {
-                                saveState = true
-                            }
-                            launchSingleTop = true
-                            restoreState = true
+                val directories =
+                    outputDirectory.replace(dataViewModel.externalStorage, "Internal Storage")
+                        .split("/")
+                Text("Output: ", style = MaterialTheme.typography.titleMedium)
+                Row (Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                    Row(Modifier.horizontalScroll(rememberScrollState()).weight(.9f), verticalAlignment = Alignment.CenterVertically) {
+                        for (index in 0 until directories.size) {
+                            if (index != 0)
+                                Icon(
+                                    Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                                    contentDescription = "",
+                                    modifier = Modifier.size(20.dp)
+                                )
+                            Text(
+                                directories[index],
+                                fontStyle = FontStyle.Italic,
+                                maxLines = 1,
+                                style = MaterialTheme.typography.titleSmall
+                            )
                         }
-                    }), textDecoration = TextDecoration.Underline
-                )
-                LaunchedEffect(outputDirectory) {
-                    scroll.animateScrollTo(scroll.maxValue)
+                    }
+                    Icon(
+                        Icons.Default.Edit,
+                        contentDescription = null,
+                        modifier = Modifier.padding(horizontal = 4.dp).clickable {
+                            navController.navigate("${Screens.SELECTOR}/true")
+                        })
                 }
             }
-            Text("Version: ${payload?.version}")
-            Text("Security Patch Level: ${payload?.securityPatch}")
-            Text("Manifest Length: ${payload?.manifestLength}")
-            Text("Signature Length: ${payload?.signatureLength}")
+            Text("Version: ${payload?.version}", maxLines = 1, style = MaterialTheme.typography.bodyMedium)
+            Text("Security Patch Level: ${payload?.securityPatch}", maxLines = 1, style = MaterialTheme.typography.bodyMedium)
+            Text("Manifest Length: ${payload?.manifestLength}", maxLines = 1, style = MaterialTheme.typography.bodyMedium)
+            Text("Signature Length: ${payload?.signatureLength}", maxLines = 1, style = MaterialTheme.typography.bodyMedium)
         }
         if (isExtracting) {
             Column(
@@ -149,6 +266,7 @@ fun ExtractScreen(navController: NavHostController, dataViewModel: DataViewModel
                     textAlign = TextAlign.End,
                     modifier = Modifier.fillMaxWidth()
                 )
+                @Suppress("DEPRECATION")
                 LinearProgressIndicator(
                     completed.toFloat().div(operations),
                     modifier = Modifier
@@ -166,12 +284,12 @@ fun ExtractScreen(navController: NavHostController, dataViewModel: DataViewModel
                     .fillMaxSize()
                     .padding(horizontal = 6.dp, vertical = 6.dp)
                     .border(1.dp, Color.LightGray, RoundedCornerShape(8.dp))
-                    .background(if (isDynamicColor) MaterialTheme.colorScheme.surface else if (isDarkTheme) Color.Black else Color.White)
+                    .background(if (isDynamicColor) MaterialTheme.colorScheme.surface else if (isDarkTheme) Color.Black else Color.White, RoundedCornerShape(8.dp))
             ) {
 
-                if (isSelecting) {
+                if (operations > 0) {
                     MyButton(enabled = !isExtracting, isDarkTheme = isDarkTheme, modifier = Modifier
-                        .width(navController.context.resources.displayMetrics.widthPixels.dp / 4.5f)
+                        .fillMaxWidth(.4f).wrapContentSize(unbounded = true)
                         .padding(bottom = 24.dp)
                         .align(Alignment.BottomCenter)
                         .zIndex(1f),
@@ -180,10 +298,11 @@ fun ExtractScreen(navController: NavHostController, dataViewModel: DataViewModel
                         }) {
                         Text(
                             "EXTRACT",
-                            modifier = Modifier.padding(horizontal = 24.dp, vertical = 6.dp),
+                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
                             textAlign = TextAlign.Center,
                             fontWeight = FontWeight.W800,
-                            fontSize = 18.sp,
+                            fontSize = 16.sp,
+                            maxLines = 1,
                             fontFamily = FontFamily(Font(R.font.doto))
                         )
                     }
@@ -210,7 +329,7 @@ fun ExtractScreen(navController: NavHostController, dataViewModel: DataViewModel
                             end = 8.dp,
                             bottom = 70.dp
                         ),
-                        columns = GridCells.Adaptive(navController.context.resources.displayMetrics.widthPixels.dp / 6)
+                        columns = GridCells.Adaptive(150.dp)
                     ) {
                         items(info.partitions.size) { index ->
                             PartitionCard(dataViewModel, info.partitions[index])
@@ -245,7 +364,7 @@ fun PartitionCard(dataViewModel: DataViewModel, partition: Partition) {
         Box(
             modifier = Modifier
                 .padding(8.dp)
-                .fillMaxWidth()
+                .fillMaxWidth().wrapContentSize()
                 .background(backgroundColor, RoundedCornerShape(8.dp))
                 .border(
                     1.dp,
@@ -295,24 +414,24 @@ fun PartitionCard(dataViewModel: DataViewModel, partition: Partition) {
                 modifier = Modifier.fillMaxSize()
             ) {
                 Icon(
-                    imageVector = if (it.isSelected == true) Icons.Default.Check else ImageVector.vectorResource(
+                    imageVector = if (it.isSelected == true) Icons.Default.Check else if (it.statusCode == 4) Icons.Default.Clear else ImageVector.vectorResource(
                         R.drawable.baseline_disc_full_24
                     ),
                     contentDescription = "Drive",
-                    Modifier.padding(8.dp)
+                    Modifier.padding(4.dp)
                 )
                 Column(
                     Modifier
-                        .padding(start = 4.dp, top = 8.dp, bottom = 16.dp)
+                        .padding(top = 6.dp, bottom = 12.dp)
                         .fillMaxSize()
                 ) {
                     Text(
                         partition.name,
                         fontFamily = FontFamily.Monospace,
-                        style = MaterialTheme.typography.bodyLarge,
+                        style = MaterialTheme.typography.bodyMedium,
                         maxLines = 1
                     )
-                    Spacer(Modifier.height(4.dp))
+                    Spacer(Modifier.height(2.dp))
                     Text(
                         "Size: ${Utils.parseSize(partition.size)}",
                         maxLines = 1,
