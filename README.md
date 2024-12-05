@@ -25,6 +25,5 @@
 + Add an option to select more images while previous one still in progress
 
 ## Credit
-+ https://github.com/rajmani7584/payload-dumper-android-rust - native library
-+ https://github.com/ssut/payload-dumper-go - core of library
++ https://github.com/rajmani7584/payload-dumper-android-rust - native library (core of the app)
 + https://fonts.google.com/specimen/Doto - Dotted Font
