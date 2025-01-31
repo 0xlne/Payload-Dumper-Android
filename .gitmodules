@@ -1,0 +1,4 @@
+[submodule "lib/payload-dumper-rust"]
+	path = lib/payload-dumper-rust
+	url = git@github.com:rajmani7584/payload-dumper-android-rust.git
+	branch = main
