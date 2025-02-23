@@ -24,7 +24,7 @@
 
 ### Screenshots:
 ![Screenshot 1](screenshots/screenshot_1.jpg) ![Screenshot 2](screenshots/screenshot_2.jpg) ![Screenshot 3](screenshots/screenshot_3.jpg)
-![Screenshot 4](screenshots/screenshot_4.jpg) ![Screenshot 5](screenshots/screenshot_4.jpg) ![Screenshot 6](screenshots/screenshot_6.jpg)
+![Screenshot 4](screenshots/screenshot_4.jpg) ![Screenshot 5](screenshots/screenshot_5.jpg) ![Screenshot 6](screenshots/screenshot_6.jpg)
 
 ## Credit
 + https://github.com/rajmani7584/payload-dumper-android-rust - native library (core of the app)
