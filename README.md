@@ -19,7 +19,7 @@
 - [x] Add option to Log for Debugging (Added)
 - [x] Add incremental detection check (Added)
 - [ ] Add an option to select more images while previous one still in progress
-- [x] Add an option to cancel ongoing proccess
+- [ ] Add an option to cancel ongoing proccess
 
 
 ### Screenshots:
