@@ -13,7 +13,7 @@ android {
         minSdk = 24
         targetSdk = 34
         versionCode = 1
-        versionName = "3.5"
+        versionName = "4.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -67,5 +67,5 @@ dependencies {
 
     implementation(libs.androidx.datastore.preferences)
 
-    implementation("com.sebastianneubauer.jsontree:jsontree:2.4.1")
+    implementation(libs.jsontree)
 }
