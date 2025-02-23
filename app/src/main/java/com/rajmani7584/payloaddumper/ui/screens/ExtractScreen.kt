@@ -31,6 +31,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.automirrored.filled.List
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -385,6 +387,7 @@ fun PartitionCard(dataModel: DataViewModel, partition: Partition, modifier: Modi
     val isDarkTheme by dataModel.isDarkTheme.collectAsState()
     val selectedPartition by dataModel.selectedPartition
     val completedPartition by dataModel.completedPayload.collectAsState()
+    val states = completedPartition[partition.name]
 
     var textColor = MaterialTheme.colorScheme.onBackground
     val color = if (selectedPartition.contains(partition.name)) {
@@ -447,7 +450,7 @@ fun PartitionCard(dataModel: DataViewModel, partition: Partition, modifier: Modi
         Row (Modifier
             .padding(8.dp)
             .zIndex(1f), verticalAlignment = Alignment.CenterVertically) {
-            Icon(ImageVector.vectorResource(R.drawable.baseline_disc_full_24), contentDescription = "Disc", tint = textColor)
+            Icon(if (states?.statusCode == PartitionState.FAILED) Icons.Default.Clear else if (selectedPartition.contains(partition.name) || states?.statusCode == PartitionState.EXTRACTED) Icons.Default.Check else ImageVector.vectorResource(R.drawable.baseline_disc_full_24), contentDescription = "Disc", tint = textColor)
             Spacer(Modifier.width(6.dp))
             Column {
                 Text(partition.name, fontFamily = FontFamily.Monospace, color = textColor)
