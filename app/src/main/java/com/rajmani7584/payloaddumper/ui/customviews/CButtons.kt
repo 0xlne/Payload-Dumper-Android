@@ -39,3 +39,15 @@ fun NButton(isDarkTheme: Boolean = false, isActive: Boolean = false, onClick: ()
         )
     }
 }
+
+@Composable
+fun MyButton(enabled: Boolean = true, isDarkTheme: Boolean = false, modifier: Modifier = Modifier, onClick: () -> Unit, content: @Composable () -> Unit) {
+    Button(enabled = enabled, modifier = modifier, onClick = onClick,
+        colors = ButtonDefaults.textButtonColors(
+            containerColor = if (isDarkTheme) Color(0xFFD7D8D8) else Color(0xFF1E2225),
+            contentColor = if (isDarkTheme) Color.Black else Color.White,
+            disabledContainerColor = Color(0x88888888)
+        )) {
+        content()
+    }
+}

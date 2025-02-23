@@ -8,36 +8,40 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.ui.platform.LocalContext
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.rajmani7584.payloaddumper.DataViewModel
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 
 private val DarkColorScheme = darkColorScheme(
     primary = Purple80,
     secondary = PurpleGrey80,
     tertiary = Pink80,
-    background = Color(0xFF28272C),
-    surface = Color(0xFF141318),
-    errorContainer = Color(0xFFD71921)
+    background = Color(0xFF000000),
+    primaryContainer = Color(0xFFD7D8D8),
+    onPrimaryContainer = Color.Black,
+    onBackground = Color(0xFFD7D8D8),
+    surface = Color(0xFF303030),
+    onError = Color(0xFFD7D8D8),
+    errorContainer = Color(0xFFD71921),
+    onErrorContainer = Color.White
 )
 
 private val LightColorScheme = lightColorScheme(
     primary = Purple40,
+    primaryContainer = Color(0xFF2E3235),
     secondary = PurpleGrey40,
     tertiary = Pink40,
-    background = Color(0xFFE1F3FF),
-    surface = Color(0xFFFFFFFF),
-    onSurface = Color(0xFF1E2225),
-    errorContainer = Color(0xFFF96E6C)
+    background = Color(0xFFF9F9F9),
+    surface = Color(0xFFD1D1D1),
+    surfaceContainer = Color(0xFFEEEEEE),
+    onPrimaryContainer = Color.White,
+    errorContainer = Color(0xFFD71921),
+    onErrorContainer = Color.White
     /* Other default colors to override
     surface = Color(0xFFFFFBFE),
     onPrimary = Color.White,
     onSecondary = Color.White,
+    onBackground = Color(0xFFD1D1D1),
     onTertiary = Color.White,
-    onBackground = Color(0xFF1C1B1F),
     onSurface = Color(0xFF1C1B1F),
     */
 )
@@ -46,7 +50,7 @@ private val LightColorScheme = lightColorScheme(
 fun PayloadDumperAndroidTheme(
     darkTheme: Boolean,
     // Dynamic color is available on Android 12+
-    dynamicColor: Boolean,
+    dynamicColor: Boolean = false,
     trueBlack: Boolean,
     content: @Composable () -> Unit
 ) {

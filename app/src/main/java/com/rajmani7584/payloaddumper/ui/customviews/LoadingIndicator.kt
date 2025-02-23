@@ -24,7 +24,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @Composable
-fun LoadingIndicator(size: Dp = 30.dp, speed: Long = 200, color: Color = Color.LightGray, activeColor: Color = Color(0xFF1B1D1F), secondActiveColor: Color = Color.Gray) {
+fun LoadingIndicator(modifier: Modifier = Modifier, size: Dp = 30.dp, speed: Long = 200, color: Color = Color.LightGray, activeColor: Color = Color(0xFF1B1D1F), secondActiveColor: Color = Color.Gray) {
     val n = 3
     val active = remember { mutableIntStateOf(0) }
 
@@ -37,7 +37,7 @@ fun LoadingIndicator(size: Dp = 30.dp, speed: Long = 200, color: Color = Color.L
 
     Row(
         horizontalArrangement = Arrangement.spacedBy(8.dp),
-        modifier = Modifier.wrapContentHeight()
+        modifier = modifier.wrapContentHeight()
     ) {
         for (i in 0 until n) {
             Box(

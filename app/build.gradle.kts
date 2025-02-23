@@ -66,4 +66,6 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.compose)
 
     implementation(libs.androidx.datastore.preferences)
+
+    implementation("com.sebastianneubauer.jsontree:jsontree:2.4.1")
 }
