@@ -1,0 +1,1 @@
+Extract boot.img or any other images without PC on Android
