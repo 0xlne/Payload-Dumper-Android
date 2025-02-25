@@ -12,7 +12,7 @@ android {
         applicationId = "com.rajmani7584.payloaddumper"
         minSdk = 24
         targetSdk = 34
-        versionCode = 1
+        versionCode = 20250225
         versionName = "4.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -41,6 +41,10 @@ android {
         jniLibs {
             useLegacyPackaging = true
         }
+    }
+    dependenciesInfo {
+        includeInApk = false
+        includeInBundle = false
     }
 }
 
