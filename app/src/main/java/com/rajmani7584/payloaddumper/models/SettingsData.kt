@@ -4,7 +4,6 @@ import android.content.Context
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
-import androidx.datastore.preferences.core.preferencesOf
 import androidx.datastore.preferences.preferencesDataStore
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -15,7 +14,6 @@ private val Context.dataStore by preferencesDataStore(name = "settings")
 class SettingsData(private val context: Context) {
 
         private val DARK_THEME_KEY = booleanPreferencesKey("dark_theme")
-        private val TRUE_BLACK_KEY = booleanPreferencesKey("true_black")
         private val DYNAMIC_COLOR_KEY = booleanPreferencesKey("dynamic_color")
         private val CONCURRENCY_KEY = intPreferencesKey("concurrency")
         private val LIST_VIEW_KEY = booleanPreferencesKey("list_view")
@@ -23,10 +21,6 @@ class SettingsData(private val context: Context) {
 
         val darkTheme: Flow<Boolean> = context.dataStore.data.map { preferences ->
             preferences[DARK_THEME_KEY] == true
-        }
-
-        val trueBlack: Flow<Boolean> = context.dataStore.data.map { preferences ->
-            preferences[TRUE_BLACK_KEY] == true
         }
 
         val dynamicColor: Flow<Boolean> = context.dataStore.data.map { preferences ->
@@ -45,11 +39,6 @@ class SettingsData(private val context: Context) {
             preferences[AUTO_DELETE_KEY] == true
         }
 
-        suspend fun saveTrueBlack(enabled: Boolean) {
-            context.dataStore.edit { preferences ->
-                preferences[TRUE_BLACK_KEY] = enabled
-            }
-        }
         suspend fun saveDarkTheme(enabled: Boolean) {
             context.dataStore.edit { preferences ->
                 preferences[DARK_THEME_KEY] = enabled

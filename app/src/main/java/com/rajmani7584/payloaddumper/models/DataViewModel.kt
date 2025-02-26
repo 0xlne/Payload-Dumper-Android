@@ -1,7 +1,6 @@
 package com.rajmani7584.payloaddumper.models
 
 import android.app.Application
-import android.content.Context
 import android.os.Environment
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateListOf
@@ -10,8 +9,6 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
 import com.rajmani7584.payloaddumper.MainActivity
-import com.rajmani7584.payloaddumper.MainScreen
-import com.rajmani7584.payloaddumper.ui.screens.HomeScreen
 import com.rajmani7584.payloaddumper.ui.screens.HomeScreens
 import com.rajmani7584.payloaddumper.ui.screens.LogEntry
 import kotlinx.coroutines.CoroutineScope
@@ -21,7 +18,6 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -41,8 +37,6 @@ class DataViewModel(application: Application): AndroidViewModel(application) {
 
     val isDarkTheme =
         settingsDataStore.darkTheme.stateIn(viewModelScope, SharingStarted.Eagerly, false)
-    val isTrueBlack =
-        settingsDataStore.trueBlack.stateIn(viewModelScope, SharingStarted.Eagerly, false)
     val isDynamicColor =
         settingsDataStore.dynamicColor.stateIn(viewModelScope, SharingStarted.Eagerly, false)
     val concurrency =
@@ -52,8 +46,8 @@ class DataViewModel(application: Application): AndroidViewModel(application) {
     val autoDelete =
         settingsDataStore.autoDelete.stateIn(viewModelScope, SharingStarted.Eagerly, false)
 
-    private val _has_permission = mutableStateOf<Boolean?>(null)
-    val hasPermission: State<Boolean?> = _has_permission
+    private val _hasPermission = mutableStateOf<Boolean?>(null)
+    val hasPermission: State<Boolean?> = _hasPermission
     private val _log = mutableStateListOf<LogEntry>()
     val logs: List<LogEntry> get() = _log
 
@@ -64,12 +58,6 @@ class DataViewModel(application: Application): AndroidViewModel(application) {
     fun setDarkTheme(value: Boolean) {
         viewModelScope.launch {
             settingsDataStore.saveDarkTheme(value)
-        }
-    }
-
-    fun setTrueBlack(value: Boolean) {
-        viewModelScope.launch {
-            settingsDataStore.saveTrueBlack(value)
         }
     }
 
@@ -98,12 +86,12 @@ class DataViewModel(application: Application): AndroidViewModel(application) {
     }
 
     fun setPermission(activity: MainActivity) {
-        _has_permission.value = Utils.hasPermission(activity)
+        _hasPermission.value = Utils.hasPermission(activity)
     }
 
     fun requestPermission(activity: MainActivity) {
         Utils.requestPermission(activity, this)
-        _has_permission.value = Utils.hasPermission(activity)
+        _hasPermission.value = Utils.hasPermission(activity)
     }
 
 
@@ -139,7 +127,7 @@ class DataViewModel(application: Application): AndroidViewModel(application) {
         viewModelScope.launch(Dispatchers.IO) {
             _isLoading.value = true
             _payloadError.value = null
-            delay(800)
+            delay(100)
             _payloadPath.value = path
             PayloadDumper.getPartitions(this@DataViewModel, path).onSuccess { payload ->
                 _payload.value = payload

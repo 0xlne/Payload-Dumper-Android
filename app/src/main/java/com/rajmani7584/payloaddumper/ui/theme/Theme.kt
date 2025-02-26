@@ -1,7 +1,6 @@
 package com.rajmani7584.payloaddumper.ui.theme
 
 import android.os.Build
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.dynamicDarkColorScheme
@@ -51,7 +50,6 @@ fun PayloadDumperAndroidTheme(
     darkTheme: Boolean,
     // Dynamic color is available on Android 12+
     dynamicColor: Boolean = false,
-    trueBlack: Boolean,
     content: @Composable () -> Unit
 ) {
     val colorScheme = when {
@@ -60,7 +58,7 @@ fun PayloadDumperAndroidTheme(
             if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
         }
 
-        darkTheme -> DarkColorScheme.let { if (trueBlack) it.copy(background = Color.Black, surface = Color.Black) else it }
+        darkTheme -> DarkColorScheme
         else -> LightColorScheme
     }
 

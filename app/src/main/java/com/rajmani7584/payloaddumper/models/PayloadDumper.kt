@@ -1,8 +1,6 @@
 package com.rajmani7584.payloaddumper.models
 
 import java.io.File
-import java.nio.file.Files.exists
-import kotlin.jvm.Throws
 
 object PayloadDumper {
     private external fun getPartitionList(path: String): String
@@ -38,7 +36,7 @@ object PayloadDumper {
             val incremental = payloadData[2] == "true"
             if (partitions.isEmpty()) return Result.failure(Error("Error: No Partition Found"))
 
-            Result.success(Payload(path = path, name = path.split("/").last(), version = manifestData.first(), patch = manifestData.last().let { if (it.isEmpty()) "Unknown" else it }, partitions = partitions, incremental = incremental, largest = largest))
+            Result.success(Payload(path = path, name = path.split("/").last(), version = manifestData.first(), patch = manifestData.last().let { it.ifEmpty { "Unknown" } }, partitions = partitions, incremental = incremental, largest = largest))
         }
     }
 

@@ -23,10 +23,10 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun AnimatedProgressBar(
+    modifier: Modifier = Modifier,
     progress: Float = 100f,
     backgroundColor: Color = Color(0xFFD7FDD5),
-    highlightColor: Color = Color(0xFFACF5A2),
-    modifier: Modifier = Modifier
+    highlightColor: Color = Color(0xFFACF5A2)
 ) {
     val highlightWidthFraction = 0.2f // 20% of the progress bar width
     val infiniteTransition = rememberInfiniteTransition(label = "")

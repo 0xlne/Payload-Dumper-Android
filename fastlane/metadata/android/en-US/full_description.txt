@@ -1,1 +1,1 @@
-<p><i>Payload Dumper</i> lets you extract <code>boot.img</code> or any other (partition) images without any PC, directly on your Android device.</p>
+<p><i>Payload Dumper</i> lets you extract <code>boot.img</code> or any other (partition) images without any PC and without SuperUser (root) access, directly on your Android device.</p>

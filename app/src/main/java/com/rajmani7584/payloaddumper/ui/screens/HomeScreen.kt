@@ -2,8 +2,14 @@ package com.rajmani7584.payloaddumper.ui.screens
 
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandHorizontally
+import androidx.compose.animation.expandIn
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
+import androidx.compose.animation.shrinkHorizontally
+import androidx.compose.animation.shrinkOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -58,22 +64,16 @@ fun HomeScreen(
         if (hasPermission == true) {
             NavHost(homeNavController, HomeScreens.HOME, Modifier.fillMaxSize()) {
                 composable(HomeScreens.HOME, enterTransition = {
-                    scaleIn()
+                    fadeIn() + slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.End)
                 }, exitTransition = {
-                    scaleOut()
+                    fadeOut() + slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.Start)
                 }) {
                     HomeLayout(dataModel, navController, homeNavController)
                 }
                 composable(HomeScreens.EXTRACT, enterTransition = {
-                    slideIntoContainer(
-                        AnimatedContentTransitionScope.SlideDirection.Start,
-                        tween(120)
-                    )
+                    fadeIn() + slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.Start)
                 }, exitTransition = {
-                    slideOutOfContainer(
-                        AnimatedContentTransitionScope.SlideDirection.End,
-                        tween(120)
-                    )
+                    fadeOut() + slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.End)
                 }) {
                     ExtractScreen(dataModel, navController, homeNavController)
                 }
@@ -131,7 +131,7 @@ fun HomeLayout(
                     .padding(8.dp)
                     .clickable {
                         navController.navigate("${MainScreen.SELECTOR}/false") {
-                            popUpTo(MainScreen.MainUI) {
+                            popUpTo(MainScreen.MAIN) {
                                 saveState = true
                             }
                             launchSingleTop = true
@@ -158,7 +158,10 @@ fun HomeLayout(
                         Spacer(Modifier.height(6.dp))
                         val sel = completedPartition.filter { it.value.statusCode != PartitionState.EXTRACTED && it.value.statusCode != PartitionState.FAILED }.size
                         val total = completedPartition.size
-                        if (total > 0) LinearProgressIndicator((total - sel).toFloat() / total, modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp))
+                        if (total > 0) LinearProgressIndicator(
+                            progress = { (total - sel).toFloat() / total },
+                            modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
+                        )
                     }
                 } else if (payloadError != null) {
                     Text(

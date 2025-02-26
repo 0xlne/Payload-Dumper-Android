@@ -1,32 +1,58 @@
 <div align="center">
 
-### Payload-Dumper-Android
+# Payload-Dumper-Android
 <br/>
 <img height="300px" src="./app/src/main/ic_launcher-playstore.png" alt="Launcher Icon"/>
 
-### An OTA Extractor App for Android
+### A Powerful OTA Extractor App for Android
 
 </div>
 
-### Tested on <a href="https://www.projectmatrixx.org/">MatrixxOS</a> for Nothing Phone 1 (Spacewar) And <a href="https://xmfirmwareupdater.com/hyperos">HyperOS</a> for nabu
+> ### You can extract images (boot, vendor_boot...) from a OTA.zip `without a PC`, `directly on Android`, `without root access`.
 
-## # TODO
-- [x] Add progress bar (Added)
-- [x] Add hashing to check extracted images integrity (Added)
-- [x] Add more architectures (Added)
-- [x] Add support to extract from zip file (currently payload.bin only is supported) (Added)
-- [x] Add option to view raw data (Added)
-- [x] Add option to Log for Debugging (Added)
-- [x] Add incremental detection check (Added)
-- [ ] Add an option to select more images while previous one still in progress
-- [ ] Add an option to cancel ongoing proccess
+## Supported Devices
+Tested on:
+- Spacewar
+- Nabu
+- OnePlus
+
+Should work on all Android ROMs that follow Google's ChromeOS update engine.
+
+## Features & Roadmap
+
+### Completed Features
+- ✅ **Progress Bar** - Displays real-time extraction progress
+- ✅ **Integrity Check** - Hash verification for extracted images
+- ✅ **Multi-Architecture Support** - Expanded compatibility
+- ✅ **ZIP File Extraction** - Extract directly from OTA zip files
+- ✅ **Raw Data View** - Option to inspect raw extracted data
+- ✅ **Debug Logging** - Enhanced troubleshooting and debugging
+- ✅ **Incremental Detection** - Identifies and handles incremental OTAs
+
+### Upcoming Features
+- ⏳ **Parallel Extraction** - Allow selecting additional images while extraction is in progress
+- ⏳ **Cancel Extraction** - Option to abort an ongoing extraction process
 
 
-### Screenshots:
-![Screenshot 1](screenshots/screenshot_1.jpg) ![Screenshot 2](screenshots/screenshot_2.jpg) ![Screenshot 3](screenshots/screenshot_3.jpg)
-![Screenshot 4](screenshots/screenshot_4.jpg) ![Screenshot 5](screenshots/screenshot_5.jpg) ![Screenshot 6](screenshots/screenshot_6.jpg)
+## Screenshots
+<p align="center">
+  <img src="screenshots/screenshot_1.jpg" width="250px"/>
+  <img src="screenshots/screenshot_2.jpg" width="250px"/>
+  <img src="screenshots/screenshot_3.jpg" width="250px"/>
+  <img src="screenshots/screenshot_4.jpg" width="250px"/>
+  <img src="screenshots/screenshot_5.jpg" width="250px"/>
+  <img src="screenshots/screenshot_6.jpg" width="250px"/>
+</p>
 
-## Credit
-+ https://github.com/rajmani7584/payload-dumper-android-rust - native library (core of the app)
-+ https://fonts.google.com/specimen/Doto - Dotted Font
-+ https://github.com/snappdevelopment/JsonTree - Json-Tree
+## Credits
+- [payload-dumper-android-rust](https://github.com/rajmani7584/payload-dumper-android-rust) - Core native library powering the app
+- [Doto Font](https://fonts.google.com/specimen/Doto) - Dotted font used in the UI
+- [JsonTree](https://github.com/snappdevelopment/JsonTree) - JSON tree visualization
+
+---
+### Contributing
+Contributions are welcome! Feel free to open an issue or submit a pull request to enhance the project.
+
+### License
+This project is licensed under the MIT License.
+

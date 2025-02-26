@@ -1,7 +1,6 @@
 package com.rajmani7584.payloaddumper.ui.screens
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.horizontalScroll
@@ -38,10 +37,8 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -54,7 +51,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
@@ -66,10 +62,8 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import androidx.navigation.NavHostController
 import com.rajmani7584.payloaddumper.MainScreen
@@ -207,7 +201,6 @@ fun ExtractLayout(dataModel: DataViewModel, navController: NavHostController) {
     val outputDirectory by dataModel.outputDirectory
     val listView by dataModel.isListView.collectAsState()
     val completedPartition by dataModel.completedPayload.collectAsState()
-    val selectedPartition by dataModel.selectedPartition
 
     val headerHeightPx = with(LocalDensity.current) { (MaterialTheme.typography.bodyMedium.fontSize.value.times(if (payload?.incremental == true) 6.5f else 5f)).dp.toPx() }
     val minHeightPx = with(LocalDensity.current) { 0.dp.toPx() }
@@ -358,7 +351,7 @@ fun ExtractLayout(dataModel: DataViewModel, navController: NavHostController) {
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    items(it.partitions) { partition ->
+                    items(items = it.partitions, key = { partition -> partition.name }) { partition ->
                         PartitionCard(dataModel, partition, Modifier.fillMaxWidth())
                     }
                 }
@@ -372,7 +365,7 @@ fun ExtractLayout(dataModel: DataViewModel, navController: NavHostController) {
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    items(it.partitions) { partition ->
+                    items(items = it.partitions, key = { partition -> partition.name}) { partition ->
                         PartitionCard(dataModel, partition)
                     }
                 }
@@ -463,7 +456,7 @@ fun PartitionCard(dataModel: DataViewModel, partition: Partition, modifier: Modi
                 Box(Modifier
                     .matchParentSize()
                     .zIndex(.5f)) {
-                    AnimatedProgressBar(it.progress.toFloat(), if (isDarkTheme) Color(0xFF244125) else Color(0xFF468D45), if (isDarkTheme) Color(0xFF325832) else Color(0xFFC0F9BB), Modifier.fillMaxSize())
+                    AnimatedProgressBar(progress = it.progress.toFloat(), backgroundColor = if (isDarkTheme) Color(0xFF244125) else Color(0xFF468D45), highlightColor = if (isDarkTheme) Color(0xFF325832) else Color(0xFFC0F9BB), modifier = Modifier.fillMaxSize())
                 }
             }
         }

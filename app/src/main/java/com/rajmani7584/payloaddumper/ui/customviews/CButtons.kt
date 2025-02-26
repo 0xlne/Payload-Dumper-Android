@@ -18,7 +18,7 @@ import androidx.compose.ui.res.vectorResource
 import com.rajmani7584.payloaddumper.R
 
 @Composable
-fun NButton(isDarkTheme: Boolean = false, isActive: Boolean = false, onClick: () -> Unit, page: Int = 0) {
+fun NButton(isActive: Boolean = false, onClick: () -> Unit, page: Int = 0) {
     Button (onClick = onClick, modifier = Modifier.padding(ButtonDefaults.ButtonWithIconContentPadding),
         colors = ButtonDefaults.filledTonalButtonColors().copy(containerColor = ButtonDefaults.filledTonalButtonColors().containerColor.copy(alpha = 0f))
     ) {
@@ -41,7 +41,7 @@ fun NButton(isDarkTheme: Boolean = false, isActive: Boolean = false, onClick: ()
 }
 
 @Composable
-fun MyButton(enabled: Boolean = true, isDarkTheme: Boolean = false, modifier: Modifier = Modifier, onClick: () -> Unit, content: @Composable () -> Unit) {
+fun MyButton(modifier: Modifier = Modifier, enabled: Boolean = true, isDarkTheme: Boolean = false, onClick: () -> Unit, content: @Composable () -> Unit) {
     Button(enabled = enabled, modifier = modifier, onClick = onClick,
         colors = ButtonDefaults.textButtonColors(
             containerColor = if (isDarkTheme) Color(0xFFD7D8D8) else Color(0xFF1E2225),

@@ -2,17 +2,20 @@ package com.rajmani7584.payloaddumper
 
 import android.app.Activity
 import android.os.Bundle
-import android.view.View
-import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandHorizontally
+import androidx.compose.animation.expandIn
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
-import androidx.compose.animation.slideIn
+import androidx.compose.animation.shrinkHorizontally
+import androidx.compose.animation.shrinkOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
@@ -44,10 +47,7 @@ import com.rajmani7584.payloaddumper.ui.screens.MainUI
 import com.rajmani7584.payloaddumper.ui.screens.RawData
 import com.rajmani7584.payloaddumper.ui.screens.Selector
 import com.rajmani7584.payloaddumper.ui.theme.PayloadDumperAndroidTheme
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
 class MainActivity: ComponentActivity() {
     private var requestCounter by mutableIntStateOf(0)
@@ -62,7 +62,6 @@ class MainActivity: ComponentActivity() {
             val hasPermission by dataModel.hasPermission
             val isDarkTheme by dataModel.isDarkTheme.collectAsState()
             val isDynamicColor by dataModel.isDynamicColor.collectAsState()
-            val isTrueBlack by dataModel.isTrueBlack.collectAsState()
             val darkTheme = isSystemInDarkTheme()
 
             LaunchedEffect (isDarkTheme) {
@@ -72,7 +71,7 @@ class MainActivity: ComponentActivity() {
                 if (isDynamicColor) dataModel.setDarkTheme(darkTheme)
             }
 
-            PayloadDumperAndroidTheme(isDarkTheme, isDynamicColor, isTrueBlack) {
+            PayloadDumperAndroidTheme(isDarkTheme, isDynamicColor) {
                 Scaffold { innerPadding ->
                     Column (Modifier.padding(innerPadding)) {
                         Box(Modifier.fillMaxSize()) {
@@ -96,39 +95,27 @@ class MainActivity: ComponentActivity() {
             .zIndex(.5f)) {
             val navController = rememberNavController()
             val homeNavController = rememberNavController()
-            NavHost(navController, MainScreen.MainUI, Modifier.fillMaxSize()) {
-                composable(MainScreen.MainUI, enterTransition = {
-                    scaleIn()
+            NavHost(navController, MainScreen.MAIN, Modifier.fillMaxSize()) {
+                composable(MainScreen.MAIN, enterTransition = {
+                    fadeIn() + slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.End)
                 }, exitTransition = {
-                    scaleOut()
+                    fadeOut() + slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.Start)
                 }) {
                     MainUI(this@MainActivity, dataModel, navController, homeNavController)
                 }
                 composable ("${MainScreen.SELECTOR}/{directory}",
                     arguments = listOf(navArgument("directory") { type = NavType.BoolType }),
                     enterTransition = {
-                        slideIntoContainer(
-                            AnimatedContentTransitionScope.SlideDirection.Up,
-                            tween(120)
-                        )
+                        fadeIn() + slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.Start)
                     }, exitTransition = {
-                        slideOutOfContainer(
-                            AnimatedContentTransitionScope.SlideDirection.Down,
-                            tween(120)
-                        )
+                        fadeOut() + slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.End)
                     }) {
                     Selector(dataModel, navController, homeNavController)
                 }
                 composable (MainScreen.RAW, enterTransition = {
-                    slideIntoContainer(
-                        AnimatedContentTransitionScope.SlideDirection.Up,
-                        tween(150)
-                    )
+                    fadeIn() + slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.Start)
                 }, exitTransition = {
-                    slideOutOfContainer(
-                        AnimatedContentTransitionScope.SlideDirection.Down,
-                        tween(150)
-                    )
+                    fadeOut() + slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.End)
                 }) {
                     RawData(dataModel, navController)
                 }
@@ -139,7 +126,6 @@ class MainActivity: ComponentActivity() {
             delay(40)
             dataModel.setPermission(this@MainActivity)
             if (dataModel.hasPermission.value != true) dataModel.println("File Permission Denied")
-            dataModel.println("App Initialized")
         }
     }
 
@@ -150,7 +136,7 @@ class MainActivity: ComponentActivity() {
 }
 class MainScreen {
     companion object {
-        const val MainUI = "home"
+        const val MAIN = "home"
         const val SELECTOR = "selector"
         const val RAW = "raw"
     }

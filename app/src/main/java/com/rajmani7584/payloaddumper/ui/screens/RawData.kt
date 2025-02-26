@@ -3,7 +3,6 @@ package com.rajmani7584.payloaddumper.ui.screens
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
@@ -33,9 +32,9 @@ fun RawData(dataModel: DataViewModel, navController: NavHostController) {
     val raw by dataModel.payloadRaw
 
     Box(Modifier.fillMaxSize()) {
-        Column (Modifier.padding(12.dp)) {
-                Icon(Icons.AutoMirrored.Default.ArrowBack, contentDescription = "Go Back",
-                    Modifier.clickable { navController.popBackStack() })
+        Column(Modifier.padding(12.dp)) {
+            Icon(Icons.AutoMirrored.Default.ArrowBack, contentDescription = "Go Back",
+                Modifier.clickable { navController.popBackStack() })
             Spacer(Modifier.height(8.dp))
             Text(
                 "RAW DATA",
@@ -46,8 +45,9 @@ fun RawData(dataModel: DataViewModel, navController: NavHostController) {
             var msg by remember { mutableStateOf<String?>(null) }
             msg?.let { Text(it, color = Color.Red) }
             raw?.let {
-                JsonTree(it, onLoading = { Text("Loading...") }, onError = { msg =
-                    it.message.toString()
+                JsonTree(it, onLoading = { Text("Loading...") }, onError = { err ->
+                    msg =
+                        err.message.toString()
                 }, modifier = Modifier.padding(horizontal = 8.dp))
             }
         }

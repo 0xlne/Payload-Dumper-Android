@@ -75,7 +75,12 @@ fun Selector(
     val isDir =
         appNavController.currentBackStackEntry?.arguments?.getBoolean("directory") == true
 
-    Column (Modifier.padding(horizontal = if (LocalConfiguration.current.screenWidthDp > LocalConfiguration.current.screenHeightDp) 28.dp else 12.dp, vertical = 12.dp)) {
+    Column(
+        Modifier.padding(
+            horizontal = if (LocalConfiguration.current.screenWidthDp > LocalConfiguration.current.screenHeightDp) 28.dp else 12.dp,
+            vertical = 12.dp
+        )
+    ) {
         var list by remember { mutableStateOf<List<String>>(emptyList()) }
         var canGoBack by remember { mutableStateOf(false) }
         var canWrite by remember { mutableStateOf(false) }
@@ -87,19 +92,19 @@ fun Selector(
             .fillMaxWidth()
             .padding(horizontal = 4.dp)
 
-            Icon(
-                imageVector = Icons.AutoMirrored.Default.ArrowBack,
-                contentDescription = "",
-                Modifier.clickable(onClick = {
-                    appNavController.popBackStack()
-                }),
-            )
-            Text(
-                text = "SELECT ${if (isDir) "DIRECTORY" else "PAYLOAD"}",
-                style = MaterialTheme.typography.headlineMedium,
-                fontFamily = FontFamily(Font(R.font.doto)),
-                modifier = Modifier.padding(horizontal = 12.dp)
-            )
+        Icon(
+            imageVector = Icons.AutoMirrored.Default.ArrowBack,
+            contentDescription = "",
+            Modifier.clickable(onClick = {
+                appNavController.popBackStack()
+            }),
+        )
+        Text(
+            text = "SELECT ${if (isDir) "DIRECTORY" else "PAYLOAD"}",
+            style = MaterialTheme.typography.headlineMedium,
+            fontFamily = FontFamily(Font(R.font.doto)),
+            modifier = Modifier.padding(horizontal = 12.dp)
+        )
 
         val headerHeightPx = with(LocalDensity.current) { 45.dp.toPx() }
         val minHeightPx = with(LocalDensity.current) { 0.dp.toPx() }
@@ -181,7 +186,14 @@ fun Selector(
                         verticalArrangement = Arrangement.spacedBy(2.dp),
                         modifier = Modifier
                             .fillMaxSize()
-                            .background(MaterialTheme.colorScheme.surfaceContainer.copy(alpha = .15f, red = .9f, green = .93f, blue = .95f)).clip(RoundedCornerShape(8.dp))
+                            .background(
+                                MaterialTheme.colorScheme.surfaceContainer.copy(
+                                    alpha = .15f,
+                                    red = .9f,
+                                    green = .93f,
+                                    blue = .95f
+                                )
+                            ).clip(RoundedCornerShape(8.dp))
                             .border(1.dp, Color.LightGray, RoundedCornerShape(8.dp)),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
