@@ -8,7 +8,7 @@
 
 </div>
 
-> ### You can extract images (boot, vendor_boot...) from a OTA.zip `without a PC`, `directly on Android`, `without root access`.
+> You can extract images (boot, vendor_boot...) from a OTA.zip `without a PC`, `directly on Android`, `without root access`.
 
 ## Supported Devices
 Tested on:
@@ -27,7 +27,7 @@ Should work on all Android ROMs that follow Google's ChromeOS update engine.
 - ✅ **ZIP File Extraction** - Extract directly from OTA zip files
 - ✅ **Raw Data View** - Option to inspect raw extracted data
 - ✅ **Debug Logging** - Enhanced troubleshooting and debugging
-- ✅ **Incremental Detection** - Identifies and handles incremental OTAs
+- ✅ **Incremental Detection** - Identifies incremental OTAs (Extraction not supported yet!)
 
 ### Upcoming Features
 - ⏳ **Parallel Extraction** - Allow selecting additional images while extraction is in progress
