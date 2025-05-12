@@ -10,12 +10,6 @@
 
 > You can extract images (boot, vendor_boot...) from a OTA.zip `without a PC`, `directly on Android`, `without root access`.
 
-## Supported Devices
-Tested on:
-- Spacewar
-- Nabu
-- OnePlus
-
 Should work on all Android ROMs that follow Google's ChromeOS update engine.
 
 ## Features & Roadmap
@@ -54,5 +48,5 @@ Should work on all Android ROMs that follow Google's ChromeOS update engine.
 Contributions are welcome! Feel free to open an issue or submit a pull request to enhance the project.
 
 ### License
-This project is licensed under the MIT License.
+This project is licensed under the GPL-3.0 License.
 
