@@ -24,6 +24,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontFamily
@@ -59,14 +60,18 @@ fun InfoScreen(
         ) {
             Column(Modifier.padding(26.dp)) {
                 Spacer(Modifier.height(12.dp))
-                Text("Partition Details:", fontWeight = FontWeight.W600, fontSize = 20.sp)
+                Text(stringResource(R.string.partition_details_header), fontWeight = FontWeight.W600, fontSize = 20.sp)
                 Spacer(Modifier.height(12.dp))
-                Text("Name: ${partition.name}")
+                Text(stringResource(R.string.partition_details_name, partition.name))
                 Spacer(Modifier.height(6.dp))
-                Text("Size: ${Utils.parseSize(partition.size)}")
+                Text(
+                    stringResource(
+                        R.string.partition_details_size,
+                        Utils.parseSize(partition.size)
+                    ))
                 Spacer(Modifier.height(12.dp))
                 Row {
-                    Text("Hash: ")
+                    Text(stringResource(R.string.partition_details_hash))
                     Box(
                         modifier = Modifier.background(
                             Color(0xFF101010),
@@ -76,7 +81,7 @@ fun InfoScreen(
                         var copied by remember { mutableStateOf(false) }
 
                         if (copied) Text(
-                            "Copied!", fontSize = 12.sp, modifier = Modifier
+                            stringResource(R.string.partition_details_hash_copied), fontSize = 12.sp, modifier = Modifier
                                 .align(Alignment.TopEnd)
                                 .padding(top = 6.dp, end = 36.dp),
                             color = Color.White

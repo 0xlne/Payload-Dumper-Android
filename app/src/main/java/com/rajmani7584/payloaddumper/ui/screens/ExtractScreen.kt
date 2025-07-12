@@ -58,6 +58,7 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -124,7 +125,7 @@ fun ExtractScreen(
                             DropdownMenuItem(
                                 text = {
                                     Text(
-                                        "Select All",
+                                        stringResource(R.string.extract_screen_select_all),
                                         style = MaterialTheme.typography.bodyLarge
                                     )
                                 },
@@ -139,7 +140,7 @@ fun ExtractScreen(
                             DropdownMenuItem(
                                 text = {
                                     Text(
-                                        "Deselect All",
+                                        stringResource(R.string.extract_screen_deselect_all),
                                         style = MaterialTheme.typography.bodyLarge
                                     )
                                 },
@@ -152,7 +153,7 @@ fun ExtractScreen(
                             DropdownMenuItem(
                                 text = {
                                     Text(
-                                        "Invert Selections",
+                                        stringResource(R.string.extract_screen_invert_selections),
                                         style = MaterialTheme.typography.bodyLarge
                                     )
                                 },
@@ -244,9 +245,11 @@ fun ExtractLayout(dataModel: DataViewModel, navController: NavHostController) {
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 val directories =
-                    outputDirectory.replace(dataModel.externalStorage, "Internal Storage")
+                    outputDirectory.replace(dataModel.externalStorage,
+                        stringResource(R.string.extract_screen_internal_storage)
+                    )
                         .split("/")
-                Text("Output: ", style = MaterialTheme.typography.titleSmall)
+                Text(stringResource(R.string.extract_screen_info_out_dir), style = MaterialTheme.typography.titleSmall)
                 Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                     Row(
                         Modifier
@@ -281,7 +284,7 @@ fun ExtractLayout(dataModel: DataViewModel, navController: NavHostController) {
             }
             Row {
                 Text(
-                    "Version: ",
+                    stringResource(R.string.extract_screen_info_version),
                     maxLines = 1,
                     style = MaterialTheme.typography.titleSmall
                 )
@@ -293,7 +296,7 @@ fun ExtractLayout(dataModel: DataViewModel, navController: NavHostController) {
             }
             Row {
                 Text(
-                    "Security Patch Level: ",
+                    stringResource(R.string.security_patch_level),
                     maxLines = 1,
                     style = MaterialTheme.typography.titleSmall
                 )
@@ -326,16 +329,21 @@ fun ExtractLayout(dataModel: DataViewModel, navController: NavHostController) {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(8.dp).clip(RoundedCornerShape(4.dp))
+                        .height(8.dp)
+                        .clip(RoundedCornerShape(4.dp))
                         .background(Color(0xFFACF5A2))) {
-                    Box(Modifier.fillMaxWidth(prog).fillMaxHeight().background(Color(0xFF377C33)).clip(
-                        RoundedCornerShape(4.dp)
-                    ))
+                    Box(Modifier
+                        .fillMaxWidth(prog)
+                        .fillMaxHeight()
+                        .background(Color(0xFF377C33))
+                        .clip(
+                            RoundedCornerShape(4.dp)
+                        ))
                 }
             }
         }
         HorizontalDivider()
-        if (payload == null) Text("Payload Error. Check Log", color = Color.Red)
+        if (payload == null) Text(stringResource(R.string.extract_screen_payload_error_check_log), color = Color.Red)
 
         payload?.let {
 

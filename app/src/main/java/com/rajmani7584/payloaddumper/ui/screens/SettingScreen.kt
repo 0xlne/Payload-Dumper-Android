@@ -33,6 +33,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
@@ -73,11 +74,11 @@ fun SettingScreen(dataModel: DataViewModel) {
                     Row(
                         Modifier
                             .fillMaxWidth()
-                            .clickable (!isExtracting) { showConcurrentOpts = !showConcurrentOpts },
+                            .clickable(!isExtracting) { showConcurrentOpts = !showConcurrentOpts },
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        Text("Concurrency")
+                        Text(stringResource(R.string.settings_concurrency))
                         Box(Modifier.wrapContentWidth()) {
                             Text(
                                 "$concurrency",
@@ -122,12 +123,14 @@ fun SettingScreen(dataModel: DataViewModel) {
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        Text("Default View")
+                        Text(stringResource(R.string.settings_default_view))
                         Box(
                             modifier = Modifier.wrapContentWidth()
                         ) {
                             Text(
-                                if (isListView) "List" else "Grid",
+                                if (isListView) stringResource(R.string.settings_view_list) else stringResource(
+                                    R.string.settings_view_grid
+                                ),
                                 maxLines = 1,
                                 modifier = Modifier
                                     .border(1.dp, Color.LightGray, CircleShape)
@@ -140,7 +143,7 @@ fun SettingScreen(dataModel: DataViewModel) {
                             ) {
                                 DropdownMenuItem(text = {
                                     Text(
-                                        "List",
+                                        stringResource(R.string.settings_view_list),
                                         style = MaterialTheme.typography.bodyLarge,
                                         textAlign = TextAlign.Center,
                                         modifier = Modifier.fillMaxWidth()
@@ -155,7 +158,7 @@ fun SettingScreen(dataModel: DataViewModel) {
                                 )
                                 DropdownMenuItem(text = {
                                     Text(
-                                        "Grid",
+                                        stringResource(R.string.settings_view_grid),
                                         style = MaterialTheme.typography.bodyLarge,
                                         textAlign = TextAlign.Center,
                                         modifier = Modifier.fillMaxWidth()
@@ -173,8 +176,8 @@ fun SettingScreen(dataModel: DataViewModel) {
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier.clickable(!isExtracting) { dataModel.setAutoDelete(!autoDelete) }) {
                         Column {
-                            Text("Auto Delete")
-                            Text("Delete output file on failure", style = MaterialTheme.typography.labelSmall)
+                            Text(stringResource(R.string.settings_auto_delete))
+                            Text(stringResource(R.string.settings_auto_delete_description), style = MaterialTheme.typography.labelSmall)
                         }
                         Spacer(Modifier.weight(1f))
                         CSwitch(
@@ -196,9 +199,9 @@ fun SettingScreen(dataModel: DataViewModel) {
                     )
                     {
                         Column {
-                            Text("Theme Style")
+                            Text(stringResource(R.string.settings_theme_style))
                             Text(
-                                "System require android-12+",
+                                stringResource(R.string.settings_theme_style_info),
                                 style = MaterialTheme.typography.labelSmall
                             )
                         }
@@ -206,7 +209,9 @@ fun SettingScreen(dataModel: DataViewModel) {
                             modifier = Modifier.wrapContentWidth()
                         ) {
                             Text(
-                                if (isDynamicColor) "System" else "App",
+                                if (isDynamicColor) stringResource(R.string.settings_theme_system) else stringResource(
+                                    R.string.settings_theme_app
+                                ),
                                 maxLines = 1,
                                 modifier = Modifier
                                     .border(1.dp, Color.LightGray, CircleShape)
@@ -219,7 +224,7 @@ fun SettingScreen(dataModel: DataViewModel) {
                             ) {
                                 DropdownMenuItem(text = {
                                     Text(
-                                        "System",
+                                        stringResource(R.string.settings_theme_system),
                                         style = MaterialTheme.typography.bodyLarge,
                                         textAlign = TextAlign.Center,
                                         modifier = Modifier.fillMaxWidth()
@@ -234,7 +239,7 @@ fun SettingScreen(dataModel: DataViewModel) {
                                 )
                                 DropdownMenuItem(text = {
                                     Text(
-                                        "App",
+                                        stringResource(R.string.settings_theme_app),
                                         style = MaterialTheme.typography.bodyLarge,
                                         textAlign = TextAlign.Center,
                                         modifier = Modifier.fillMaxWidth()
@@ -251,7 +256,7 @@ fun SettingScreen(dataModel: DataViewModel) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier.clickable(!isDynamicColor) { dataModel.setDarkTheme(!isDarkTheme) }) {
-                        Text("Dark Theme")
+                        Text(stringResource(R.string.settings_dark_theme))
                         Spacer(Modifier.weight(1f))
                         CSwitch(
                             enabled = !isDynamicColor,
@@ -277,12 +282,12 @@ fun SettingScreen(dataModel: DataViewModel) {
                             ctx.packageManager.getPackageInfo(ctx.packageName, 0).versionName
                                 ?: "Unable to query"
                         Text(
-                            "Version: $version",
+                            stringResource(R.string.settings_about_version, version),
                             textAlign = TextAlign.Center,
                             style = MaterialTheme.typography.titleMedium
                         )
                         Text(
-                            "Check for Update",
+                            stringResource(R.string.settings_about_version_desc),
                             style = MaterialTheme.typography.labelMedium,
                             modifier = Modifier.padding(start = 6.dp)
                         )
@@ -299,12 +304,12 @@ fun SettingScreen(dataModel: DataViewModel) {
                             ctx.startActivity(intent)
                         }) {
                         Text(
-                            "Source Code",
+                            stringResource(R.string.settings_about_source_code),
                             textAlign = TextAlign.Center,
                             style = MaterialTheme.typography.titleMedium
                         )
                         Text(
-                            "@GitHub",
+                            stringResource(R.string.settings_about_github),
                             style = MaterialTheme.typography.labelMedium,
                             modifier = Modifier.padding(start = 6.dp)
                         )
@@ -322,12 +327,12 @@ fun SettingScreen(dataModel: DataViewModel) {
                             ctx.startActivity(intent)
                         }) {
                         Text(
-                            "GitHub",
+                            stringResource(R.string.settings_about_github_main_page),
                             textAlign = TextAlign.Center,
                             style = MaterialTheme.typography.titleMedium
                         )
                         Text(
-                            "@Rajmani7584",
+                            stringResource(R.string.settings_about_github_username),
                             style = MaterialTheme.typography.labelMedium,
                             modifier = Modifier.padding(start = 6.dp)
                         )

@@ -46,6 +46,7 @@ import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -100,7 +101,9 @@ fun Selector(
             }),
         )
         Text(
-            text = "SELECT ${if (isDir) "DIRECTORY" else "PAYLOAD"}",
+            text = stringResource(R.string.selector_header, if (isDir) stringResource(R.string.selector_director) else stringResource(
+                R.string.payload
+            )),
             style = MaterialTheme.typography.headlineMedium,
             fontFamily = FontFamily(Font(R.font.doto)),
             modifier = Modifier.padding(horizontal = 12.dp)
@@ -121,9 +124,12 @@ fun Selector(
             }
         }
 
-        Column(Modifier.fillMaxWidth().nestedScroll(scrollBehavior)) {
+        Column(Modifier
+            .fillMaxWidth()
+            .nestedScroll(scrollBehavior)) {
             Row(
-                Modifier.horizontalScroll(scroll)
+                Modifier
+                    .horizontalScroll(scroll)
                     .height(with(LocalDensity.current) { headerHeight.floatValue.toDp() })
                     .padding(horizontal = 16.dp),
                 verticalAlignment = Alignment.CenterVertically
@@ -140,7 +146,8 @@ fun Selector(
                         )
                     Box(
                         contentAlignment = Alignment.Center,
-                        modifier = Modifier.fillMaxHeight()
+                        modifier = Modifier
+                            .fillMaxHeight()
                             .clickable(enabled = index != directories.size - 1, onClick = {
                                 dataModel.setLastDirectory(
                                     directories.subList(0, index + 1).joinToString("/")
@@ -165,12 +172,15 @@ fun Selector(
                             appNavController.popBackStack()
                         },
                         isDarkTheme = isDarkTheme,
-                        modifier = Modifier.padding(bottom = 15.dp).zIndex(1f)
+                        modifier = Modifier
+                            .padding(bottom = 15.dp)
+                            .zIndex(1f)
                             .align(Alignment.BottomCenter)
-                            .fillMaxWidth(.4f).wrapContentSize(unbounded = true)
+                            .fillMaxWidth(.4f)
+                            .wrapContentSize(unbounded = true)
                     ) {
                         Text(
-                            "EXTRACT HERE",
+                            stringResource(R.string.selector_extract_here),
                             modifier = Modifier.padding(vertical = 4.dp, horizontal = 12.dp),
                             fontSize = 16.sp,
                             maxLines = 1,
@@ -193,7 +203,8 @@ fun Selector(
                                     green = .93f,
                                     blue = .95f
                                 )
-                            ).clip(RoundedCornerShape(8.dp))
+                            )
+                            .clip(RoundedCornerShape(8.dp))
                             .border(1.dp, Color.LightGray, RoundedCornerShape(8.dp)),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
