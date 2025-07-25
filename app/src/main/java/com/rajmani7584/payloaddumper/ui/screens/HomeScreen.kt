@@ -35,6 +35,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -88,7 +89,7 @@ fun HomeScreen(
                 Button(onClick = {
                     dataModel.requestPermission(mainActivity)
                 }, colors = ButtonDefaults.buttonColors().copy(containerColor = MaterialTheme.colorScheme.surfaceContainer.copy(alpha = .2f, red = .6f, green = .62f, blue = .63f))) {
-                    Text("Allow file access", color = MaterialTheme.colorScheme.onBackground)
+                    Text(stringResource(R.string.first_start_allow_file_access), color = MaterialTheme.colorScheme.onBackground)
                 }
             }
         }
@@ -147,7 +148,10 @@ fun HomeLayout(
                     Column(
                         modifier = Modifier
                             .fillMaxWidth(.6f)
-                            .background(MaterialTheme.colorScheme.surfaceContainer, RoundedCornerShape(6.dp))
+                            .background(
+                                MaterialTheme.colorScheme.surfaceContainer,
+                                RoundedCornerShape(6.dp)
+                            )
                             .clickable {
                                 homeNavController.navigate(HomeScreens.EXTRACT)
                             }
@@ -160,7 +164,9 @@ fun HomeLayout(
                         val total = completedPartition.size
                         if (total > 0) LinearProgressIndicator(
                             progress = { (total - sel).toFloat() / total },
-                            modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 8.dp),
                         )
                     }
                 } else if (payloadError != null) {
@@ -171,7 +177,7 @@ fun HomeLayout(
                     )
                 } else {
                     Text(
-                        "Select a payload\nYou can select payload.bin/OTA.zip",
+                        stringResource(R.string.home_page_payload_tips),
                         textAlign = TextAlign.Center
                     )
                 }
