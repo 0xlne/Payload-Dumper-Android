@@ -46,7 +46,7 @@ fun RawData(dataModel: DataViewModel, navController: NavHostController) {
             var msg by remember { mutableStateOf<String?>(null) }
             msg?.let { Text(it, color = Color.Red) }
             raw?.let {
-                JsonTree(it, onLoading = { Text("Loading...") }, onError = { err ->
+                JsonTree(it, onLoading = { Text(stringResource(R.string.raw_data_loading)) }, onError = { err ->
                     msg =
                         err.message.toString()
                 }, modifier = Modifier.padding(horizontal = 8.dp))

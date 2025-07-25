@@ -246,7 +246,7 @@ fun ExtractLayout(dataModel: DataViewModel, navController: NavHostController) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 val directories =
                     outputDirectory.replace(dataModel.externalStorage,
-                        stringResource(R.string.extract_screen_internal_storage)
+                        stringResource(R.string.txt_internal_storage)
                     )
                         .split("/")
                 Text(stringResource(R.string.extract_screen_info_out_dir), style = MaterialTheme.typography.titleSmall)
@@ -308,7 +308,7 @@ fun ExtractLayout(dataModel: DataViewModel, navController: NavHostController) {
             }
             payload?.incremental?.let {
                 if (it) Text(
-                        "Incremental detected! (Not Supported!)",
+                        stringResource(R.string.incremental_detected),
                         maxLines = 1,
                         color = Color.Red,
                         style = MaterialTheme.typography.titleSmall

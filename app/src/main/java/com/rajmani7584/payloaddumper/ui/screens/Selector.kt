@@ -210,9 +210,9 @@ fun Selector(
                     ) {
                         if (list.isEmpty()) {
                             item {
-                                if (invalidPath) Text("invalid path", color = Color.Red)
+                                if (invalidPath) Text(stringResource(R.string.selector_screen_invalid_path), color = Color.Red)
                                 else Text(
-                                    if (File(currentPath).canRead()) "No files" else "No permission"
+                                    if (File(currentPath).canRead()) stringResource(R.string.selector_empty) else stringResource(R.string.selector_no_permission)
                                 )
                             }
                         } else {

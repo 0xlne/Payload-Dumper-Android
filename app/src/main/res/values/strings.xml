@@ -20,7 +20,12 @@
     <string name="extract_screen_invert_selections">Invert Selections</string>
     <string name="extract_screen_raw_data">Raw Data</string>
     <string name="extract_screen_payload_error_check_log">Payload Error. Check Log</string>
-    <string name="extract_screen_internal_storage">Internal Storage</string>
+    <string name="txt_internal_storage">Internal Storage</string>
+    <string name="incremental_detected">Incremental detected! (Not Supported!)</string>
+    <string name="raw_data_loading">Loading…</string>
+    <string name="selector_screen_invalid_path">This directory doesn\'t exists</string>
+    <string name="selector_empty">Directory Empty!</string>
+    <string name="selector_no_permission">No read Permision Here!</string>
     <string name="settings_concurrency">Concurrency</string>
     <string name="settings_default_view">Default View</string>
     <string name="settings_view_list">List</string>

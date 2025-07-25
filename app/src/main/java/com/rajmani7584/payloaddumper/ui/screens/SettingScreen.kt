@@ -1,7 +1,6 @@
 package com.rajmani7584.payloaddumper.ui.screens
 
 import android.content.Intent
-import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -42,6 +41,7 @@ import androidx.compose.ui.unit.sp
 import com.rajmani7584.payloaddumper.R
 import com.rajmani7584.payloaddumper.models.DataViewModel
 import com.rajmani7584.payloaddumper.ui.customviews.CSwitch
+import androidx.core.net.toUri
 
 @Composable
 fun SettingScreen(dataModel: DataViewModel) {
@@ -274,7 +274,7 @@ fun SettingScreen(dataModel: DataViewModel) {
                         .clickable {
                             val intent = Intent(
                                 Intent.ACTION_VIEW,
-                                Uri.parse("https://github.com/rajmani7584/Payload-Dumper-Android/releases/latest")
+                                "https://github.com/rajmani7584/Payload-Dumper-Android/releases/latest".toUri()
                             )
                             ctx.startActivity(intent)
                         }) {
@@ -299,7 +299,7 @@ fun SettingScreen(dataModel: DataViewModel) {
                         .clickable {
                             val intent = Intent(
                                 Intent.ACTION_VIEW,
-                                Uri.parse("https://github.com/rajmani7584/Payload-Dumper-Android")
+                                "https://github.com/rajmani7584/Payload-Dumper-Android".toUri()
                             )
                             ctx.startActivity(intent)
                         }) {
@@ -322,7 +322,7 @@ fun SettingScreen(dataModel: DataViewModel) {
                             val intent =
                                 Intent(
                                     Intent.ACTION_VIEW,
-                                    Uri.parse("https://github.com/rajmani7584")
+                                    "https://github.com/rajmani7584".toUri()
                                 )
                             ctx.startActivity(intent)
                         }) {
