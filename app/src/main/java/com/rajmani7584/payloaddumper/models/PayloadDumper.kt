@@ -13,7 +13,7 @@ object PayloadDumper {
     ): String
 
     init {
-        System.loadLibrary("payload-dumper-rust")
+        System.loadLibrary("payload_dumper_rust")
     }
 
     fun getPartitions(viewModel: DataViewModel, path: String): Result<Payload> {

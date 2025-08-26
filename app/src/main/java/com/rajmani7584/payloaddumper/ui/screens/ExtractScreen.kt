@@ -37,6 +37,7 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -64,6 +65,7 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.navigation.NavHostController
@@ -320,25 +322,28 @@ fun ExtractLayout(dataModel: DataViewModel, navController: NavHostController) {
             val total = completedPartition.size
             if (total != 0) {
                 val prog = (total - sel).toFloat() / total
-                Text(
-                    "${total - sel}/$total",
-                    textAlign = TextAlign.End,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                )
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(8.dp)
-                        .clip(RoundedCornerShape(4.dp))
+                        .height(16.dp)
+                        .clip(RoundedCornerShape(12.dp))
                         .background(Color(0xFFACF5A2))) {
                     Box(Modifier
                         .fillMaxWidth(prog)
                         .fillMaxHeight()
                         .background(Color(0xFF377C33))
                         .clip(
-                            RoundedCornerShape(4.dp)
+                            RoundedCornerShape(12.dp)
                         ))
+                    Text(
+                        "${total - sel}/$total ",
+                        textAlign = TextAlign.End,
+                        style = MaterialTheme.typography.labelSmall,
+                        color = Color.White,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .align(Alignment.CenterEnd)
+                    )
                 }
             }
         }
@@ -365,13 +370,13 @@ fun ExtractLayout(dataModel: DataViewModel, navController: NavHostController) {
                 }
             } else {
                 LazyVerticalGrid(
-                    GridCells.Adaptive(it.largest.length.dp * MaterialTheme.typography.bodyMedium.fontSize.value),
+                    GridCells.Adaptive(it.largest.length.dp * MaterialTheme.typography.bodyMedium.fontSize.value / 1.2f),
                     contentPadding = PaddingValues(
                         top = 15.dp,
                         bottom = 130.dp
                     ),
-                    verticalArrangement = Arrangement.spacedBy(12.dp),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     items(items = it.partitions, key = { partition -> partition.name}) { partition ->
                         PartitionCard(dataModel, partition)
@@ -449,14 +454,14 @@ fun PartitionCard(dataModel: DataViewModel, partition: Partition, modifier: Modi
             )
         }) {
         Row (Modifier
-            .padding(8.dp)
+            .padding(6.dp)
             .zIndex(1f), verticalAlignment = Alignment.CenterVertically) {
             Icon(if (states?.statusCode == PartitionState.FAILED) Icons.Default.Clear else if (selectedPartition.contains(partition.name) || states?.statusCode == PartitionState.EXTRACTED) Icons.Default.Check else ImageVector.vectorResource(R.drawable.baseline_disc_full_24), contentDescription = "Disc", tint = textColor)
             Spacer(Modifier.width(6.dp))
             Column {
-                Text(partition.name, fontFamily = FontFamily.Monospace, color = textColor)
+                Text(text = partition.name, fontFamily = FontFamily.Monospace, color = textColor, style = MaterialTheme.typography.bodyMedium, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 Spacer(Modifier.height(4.dp))
-                Text(Utils.parseSize(partition.size), color = textColor)
+                Text(Utils.parseSize(partition.size), color = textColor, style = MaterialTheme.typography.bodyMedium)
             }
         }
         completedPartition[partition.name]?.let {

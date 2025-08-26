@@ -62,7 +62,7 @@ fun InfoScreen(
                 Spacer(Modifier.height(12.dp))
                 Text(stringResource(R.string.partition_details_header), fontWeight = FontWeight.W600, fontSize = 20.sp)
                 Spacer(Modifier.height(12.dp))
-                Text(stringResource(R.string.partition_details_name, partition.name))
+                Text(stringResource(R.string.partition_details_name, partition.name), fontFamily = FontFamily.Monospace)
                 Spacer(Modifier.height(6.dp))
                 Text(
                     stringResource(
