@@ -2,30 +2,30 @@
 
 # Payload-Dumper-Android
 <br/>
-<img height="300px" src="./app/src/main/ic_launcher-playstore.png" alt="Launcher Icon"/>
+<img height="300px" src="./app/src/main/ic_launcher-playstore.png" alt="Launcher icon"/>
 
-### A Powerful OTA Extractor App for Android
+### A powerful OTA extractor app for Android
 
 </div>
 
-> You can extract images (boot, vendor_boot...) from a OTA.zip `without a PC`, `directly on Android`, `without root access`.
+### You can extract images (boot, vendor_boot...) from a payload.bin or OTA.zip **directly on Android**.
 
 Should work on all Android ROMs that follow Google's ChromeOS update engine.
 
-## Features & Roadmap
+## Features & roadmap
 
-### Completed Features
-- ✅ **Progress Bar** - Displays real-time extraction progress
-- ✅ **Integrity Check** - Hash verification for extracted images
-- ✅ **Multi-Architecture Support** - Expanded compatibility
-- ✅ **ZIP File Extraction** - Extract directly from OTA zip files
-- ✅ **Raw Data View** - Option to inspect raw extracted data
-- ✅ **Debug Logging** - Enhanced troubleshooting and debugging
-- ✅ **Incremental Detection** - Identifies incremental OTAs (Extraction not supported yet!)
+### Completed features
+- ✅ **Progress bar** - displays real-time extraction progress
+- ✅ **Integrity check** - hash verification for extracted images
+- ✅ **Multi-architecture support** - expanded compatibility
+- ✅ **Zip file extraction** - extract directly from OTA zip files
+- ✅ **Raw data view** - option to inspect raw extracted data
+- ✅ **Debug logging** - enhanced troubleshooting and debugging
+- ✅ **Incremental detection** - identifies incremental OTAs (extraction not supported yet!)
 
-### Upcoming Features
-- ⏳ **Parallel Extraction** - Allow selecting additional images while extraction is in progress
-- ⏳ **Cancel Extraction** - Option to abort an ongoing extraction process
+### Upcoming features
+- ⏳ **Parallel extraction** - allow selecting additional images while extraction is in progress
+- ⏳ **Cancel extraction** - option to abort an ongoing extraction process
 
 
 ## Screenshots
@@ -45,8 +45,9 @@ Should work on all Android ROMs that follow Google's ChromeOS update engine.
 
 ---
 ### Contributing
-Contributions are welcome! Feel free to open an issue or submit a pull request to enhance the project.
+Contributions are welcome!
+Feel free to open an issue or submit a pull request to enhance the project.
 
 ### License
-This project is licensed under the GPL-3.0 License.
+This project is licensed under the GPL-3.0 license.
 

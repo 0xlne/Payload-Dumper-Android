@@ -1,1 +1,15 @@
-<p><i>Payload Dumper</i> lets you extract <code>boot.img</code> or any other (partition) images without any PC and without SuperUser (root) access, directly on your Android device.</p>
+<p><b>Payload dumper</b> extracts boot.img and other partition images (boot, vendor_boot, etc.) from a payload.bin or ota.zip directly on your Android device.</p>
+
+  - Real-time progress bar for extraction status
+  - Integrity check with hash verification for extracted images
+  - Multi-architecture support for broader device compatibility
+  - Direct ota zip extraction without manual unpacking
+  - Raw data view to inspect extracted content
+  - Debug logging for troubleshooting and diagnostics
+  - Incremental ota detection (extraction of incremental otas is not supported yet)
+
+
+<b>Upcoming features:</b>
+
+  - ability to cancel an ongoing extraction
+  - option to select from/to USB storage
